@@ -1,244 +1,247 @@
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background: #f6f7f8;
-    color: #1c1c1c;
-    line-height: 1.6;
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+  color: #222;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 a {
-    color: #0079d3;
-    text-decoration: none;
-}
-a:hover { text-decoration: underline; }
-
-/* ---- Navbar ---- */
-.navbar {
-    background: #fff;
-    border-bottom: 1px solid #edeff1;
-    padding: 0 1.5rem;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 100;
+  color: #0077cc;
+  text-decoration: none;
 }
 
-.navbar-brand {
-    font-weight: 800;
-    font-size: 1.35rem;
-    color: #d2413a;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
+a:hover {
+  text-decoration: underline;
 }
 
-.navbar-brand a { color: inherit; text-decoration: none; }
-.navbar nav { display: flex; gap: 0.5rem; align-items: center; }
-
-/* ---- Container ---- */
-.container {
-    max-width: 740px;
-    margin: 2rem auto;
-    padding: 0 1rem;
+main {
+  flex: 1;
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 2rem 1rem;
 }
 
-/* ---- Boutons ---- */
-.btn {
-    display: inline-block;
-    padding: 0.45rem 1rem;
-    border-radius: 9999px;
-    font-size: 0.875rem;
-    font-weight: 700;
-    cursor: pointer;
-    border: 1px solid transparent;
-    transition: background 0.15s, border-color 0.15s;
-    text-decoration: none;
+nav {
+  background: #222;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
-.btn-primary {
-    background: #0079d3;
-    color: #fff;
-    border-color: #0079d3;
-}
-.btn-primary:hover { background: #006cbf; text-decoration: none; }
-
-.btn-outline {
-    background: transparent;
-    color: #0079d3;
-    border-color: #0079d3;
-}
-.btn-outline:hover { background: #e8f0fe; text-decoration: none; }
-
-/* ---- Formulaires ---- */
-.form-card {
-    background: #fff;
-    border: 1px solid #edeff1;
-    border-radius: 4px;
-    padding: 2rem;
-    max-width: 440px;
-    margin: 0 auto;
+nav a {
+  color: #fff;
+  font-size: 0.9rem;
 }
 
-.form-card h1 {
-    font-size: 1.2rem;
-    margin-bottom: 1.5rem;
-    color: #1c1c1c;
+nav .brand {
+  font-weight: bold;
+  font-size: 1rem;
+  margin-right: auto;
+}
+
+footer {
+  background: #222;
+  color: #aaa;
+  text-align: center;
+  padding: 0.75rem;
+  font-size: 0.85rem;
+}
+
+h1 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+button, .btn {
+  padding: 0.4rem 0.9rem;
+  background: #0077cc;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  text-decoration: none;
+  display: inline-block;
+}
+
+button:hover, .btn:hover {
+  background: #005fa3;
+}
+
+.btn-danger {
+  background: #cc3333;
+}
+
+.btn-danger:hover {
+  background: #aa2222;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: #555;
+  border: 1px solid #ccc;
+}
+
+.btn-ghost:hover {
+  background: #eee;
+}
+
+input, textarea, select {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: #0077cc;
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: bold;
+  margin-bottom: 0.3rem;
 }
 
 .form-group {
-    margin-bottom: 1rem;
+  margin-bottom: 1rem;
 }
 
-.form-group label {
-    display: block;
-    font-size: 0.8rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 0.3rem;
-    color: #878a8c;
-}
-
-.form-group input,
-.form-group textarea {
-    width: 100%;
-    padding: 0.6rem 0.8rem;
-    border: 1px solid #edeff1;
-    border-radius: 4px;
-    font-size: 0.95rem;
-    outline: none;
-    transition: border-color 0.15s;
-    background: #f6f7f8;
-    font-family: inherit;
-}
-
-.form-group input:focus,
-.form-group textarea:focus {
-    border-color: #0079d3;
-    background: #fff;
-}
-
-.form-group textarea {
-    resize: vertical;
-    min-height: 120px;
-}
-
-.form-actions {
-    display: flex;
-    gap: 0.5rem;
-    justify-content: flex-end;
-    margin-top: 1rem;
+.form-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 1.5rem;
+  max-width: 420px;
+  margin: 2rem auto;
 }
 
 .form-footer {
-    text-align: center;
-    margin-top: 1.2rem;
-    font-size: 0.9rem;
-    color: #878a8c;
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  color: #555;
 }
 
-/* ---- Alertes ---- */
 .alert {
-    padding: 0.7rem 1rem;
-    border-radius: 4px;
-    margin-bottom: 1rem;
-    font-size: 0.9rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
 }
 
-.alert-error {
-    background: #fff0f0;
-    border: 1px solid #ffb3b3;
-    color: #d93025;
-}
-
-.alert-success {
-    background: #f0fff4;
-    border: 1px solid #b3ffd1;
-    color: #1a7f4b;
-}
-
-.alert-warning {
-    background: #fffbf0;
-    border: 1px solid #ffe0a0;
-    color: #8a6500;
-}
-
-/* ---- Liste des posts ---- */
-.post-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
+.alert-error   { background: #fde8e8; color: #c00; border: 1px solid #f5c0c0; }
+.alert-success { background: #e8f8ed; color: #1a7a3f; border: 1px solid #b6e5c8; }
 
 .post-card {
-    background: #fff;
-    border: 1px solid #edeff1;
-    border-radius: 4px;
-    padding: 1rem 1.2rem;
-    transition: border-color 0.15s;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1rem;
 }
-.post-card:hover { border-color: #818384; }
+
+.post-card h2 {
+  font-size: 1.1rem;
+  margin-bottom: 0.4rem;
+}
 
 .post-meta {
-    display: flex;
-    gap: 0.75rem;
-    font-size: 0.8rem;
-    color: #878a8c;
-    margin-bottom: 0.4rem;
+  font-size: 0.8rem;
+  color: #777;
+  margin-bottom: 0.5rem;
 }
-
-.post-author { font-weight: 700; color: #1c1c1c; }
-
-.post-title {
-    font-size: 1.05rem;
-    margin-bottom: 0.4rem;
-}
-.post-title a { color: #1c1c1c; }
-.post-title a:hover { color: #0079d3; text-decoration: none; }
 
 .post-excerpt {
-    font-size: 0.9rem;
-    color: #3c3c3c;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+  font-size: 0.9rem;
+  color: #444;
+  margin-bottom: 0.75rem;
 }
 
-/* ---- Post complet ---- */
-.post-full {
-    background: #fff;
-    border: 1px solid #edeff1;
-    border-radius: 4px;
-    padding: 1.5rem 2rem;
+.post-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding-top: 0.5rem;
+  border-top: 1px solid #eee;
 }
 
-.post-full h1 {
-    margin: 0.5rem 0 1rem;
-    font-size: 1.4rem;
+.post-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 0.4rem;
 }
 
-.post-content {
-    font-size: 0.95rem;
-    line-height: 1.7;
-    white-space: pre-wrap;
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
 }
 
-/* ---- État vide ---- */
+.comment-list {
+  margin: 0.75rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.comment-item {
+  background: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.comment-author {
+  font-weight: bold;
+  font-size: 0.8rem;
+  margin-bottom: 0.2rem;
+}
+
+.comment-form {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.comment-form input {
+  flex: 1;
+}
+
 .empty-state {
-    text-align: center;
-    padding: 3rem;
-    background: #fff;
-    border: 1px solid #edeff1;
-    border-radius: 4px;
-    color: #878a8c;
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #888;
 }
-.empty-state p { margin-bottom: 1rem; }
+
+.badge {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  background: #e8f0fe;
+  color: #0055aa;
+  border-radius: 999px;
+  font-size: 0.75rem;
+}

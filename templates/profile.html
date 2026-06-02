@@ -1,0 +1,10 @@
+{{define "content"}}
+<h1>Profil</h1>
+{{with .User}}
+<div class="form-card">
+    <p><strong>Nom d'utilisateur :</strong> {{.Username}}</p>
+    <p style="margin-top:0.5rem"><strong>Email :</strong> {{.Email}}</p>
+    <a href="/logout" class="btn btn-ghost" style="margin-top:1rem">Se déconnecter</a>
+</div>
+{{end}}
+{{end}}

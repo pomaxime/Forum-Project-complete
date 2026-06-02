@@ -1,0 +1,16 @@
+{{define "navbar"}}
+<header>
+    <nav>
+        <a href="/">Accueil</a>
+
+        {{if .User}}
+            <a href="/create">Créer un post</a>
+            <a href="/profile">Profil</a>
+            <a href="/logout">Logout</a>
+        {{else}}
+            <a href="/login">Login</a>
+            <a href="/register">Register</a>
+        {{end}}
+    </nav>
+</header>
+{{end}}

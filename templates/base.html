@@ -1,0 +1,28 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reddick</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/responsive.css">
+    <link rel="stylesheet" href="/static/css/post.css">
+    <link rel="stylesheet" href="/static/css/auth.css">
+</head>
+<body>
+
+{{template "navbar" .}}
+
+<main>
+    {{template "alerts" .}}
+    {{template "content" .}}
+</main>
+
+{{template "footer" .}}
+
+<script src="/static/js/main.js"></script>
+<script src="/static/js/filter.js"></script>
+</body>
+</html>
+{{end}}

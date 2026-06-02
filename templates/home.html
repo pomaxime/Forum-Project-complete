@@ -1,0 +1,57 @@
+{{define "content"}}
+
+<h1>Reddick</h1>
+
+<div class="filters">
+    <form method="GET" action="/">
+        <select name="category">
+            <option value="">Toutes</option>
+            <option value="tech">Tech</option>
+            <option value="jeux">Jeux</option>
+        </select>
+        <button type="submit">Filtrer</button>
+    </form>
+</div>
+
+{{range .Posts}}
+<article class="post">
+    <h2>{{.Title}}</h2>
+    <p>{{.Content}}</p>
+
+    <div class="interactions">
+        <form method="POST" action="/like">
+            <input type="hidden" name="post_id" value="{{.ID}}">
+            <button type="submit">👍 {{.Likes}}</button>
+        </form>
+
+        <form method="POST" action="/dislike">
+            <input type="hidden" name="post_id" value="{{.ID}}">
+            <button type="submit">👎 {{.Dislikes}}</button>
+        </form>
+    </div>
+
+    {{if $.User}}
+    <div class="actions">
+        <a href="/edit?id={{.ID}}">Edit</a>
+        <a href="/delete?id={{.ID}}">Delete</a>
+    </div>
+    {{end}}
+
+    <div class="comments">
+        {{range .Comments}}
+            <p>{{.Content}}</p>
+        {{end}}
+    </div>
+
+    {{if $.User}}
+    <form method="POST" action="/comment">
+        <input type="hidden" name="post_id" value="{{.ID}}">
+        <input name="content" placeholder="Ajouter un commentaire" required>
+        <button type="submit">Envoyer</button>
+    </form>
+    {{end}}
+
+</article>
+{{end}}
+
+{{end}}

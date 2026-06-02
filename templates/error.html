@@ -1,0 +1,7 @@
+{{define "content"}}
+<div class="empty-state">
+    <h1>{{if .Code}}Erreur {{.Code}}{{else}}Erreur{{end}}</h1>
+    <p>{{if .Message}}{{.Message}}{{else}}Une erreur est survenue.{{end}}</p>
+    <a href="/" class="btn btn-ghost" style="margin-top:1rem">Retour à l'accueil</a>
+</div>
+{{end}}

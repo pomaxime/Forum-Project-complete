@@ -1,12 +1,15 @@
 package handlers
 
 import (
+	"bytes"
 	"database/sql"
 	"html/template"
 	"net/http"
 	"strings"
 	"time"
 
+	"forum/middleware"
+	"forum/models"
 	"forum/utils"
 
 	"github.com/google/uuid"
@@ -24,11 +27,20 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodGet:
-		data := map[string]string{}
-		if r.URL.Query().Get("registered") == "1" {
-			data["Success"] = "Inscription réussie ! Connectez-vous."
+		data := models.TemplateData{
+			IsLoggedIn: middleware.GetUserIDFromCookie(w, h.db, r) != 0,
 		}
-		tmpl.ExecuteTemplate(w, "base", data)
+
+		if r.URL.Query().Get("registered") == "1" {
+			data.Success = "Inscription réussie ! Connectez-vous."
+		}
+
+		var buf bytes.Buffer
+		if err := tmpl.ExecuteTemplate(&buf, "base", data); err != nil {
+			http.Error(w, "Erreur rendu template", http.StatusInternalServerError)
+			return
+		}
+		buf.WriteTo(w)
 
 	case http.MethodPost:
 		email := strings.TrimSpace(r.FormValue("email"))
@@ -36,7 +48,13 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 		// Validation basique
 		if err := utils.ValidateLogin(email, password); err != nil {
-			tmpl.ExecuteTemplate(w, "base", map[string]string{"Error": err.Error()})
+			data := models.TemplateData{Error: err.Error()}
+			var buf bytes.Buffer
+			if err := tmpl.ExecuteTemplate(&buf, "base", data); err != nil {
+				http.Error(w, "Erreur rendu template", http.StatusInternalServerError)
+				return
+			}
+			buf.WriteTo(w)
 			return
 		}
 
@@ -44,7 +62,13 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		id, _, hashedPassword, err := getUserByEmail(h.db, email)
 		if err == sql.ErrNoRows {
 			// Message volontairement vague (sécurité : ne pas révéler si l'email existe)
-			tmpl.ExecuteTemplate(w, "base", map[string]string{"Error": "Email ou mot de passe incorrect"})
+			data := models.TemplateData{Error: "Email ou mot de passe incorrect"}
+			var buf bytes.Buffer
+			if err := tmpl.ExecuteTemplate(&buf, "base", data); err != nil {
+				http.Error(w, "Erreur rendu template", http.StatusInternalServerError)
+				return
+			}
+			buf.WriteTo(w)
 			return
 		}
 		if err != nil {
@@ -54,7 +78,13 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 		// Vérification bcrypt
 		if err := utils.CheckPassword(hashedPassword, password); err != nil {
-			tmpl.ExecuteTemplate(w, "base", map[string]string{"Error": "Email ou mot de passe incorrect"})
+			data := models.TemplateData{Error: "Email ou mot de passe incorrect"}
+			var buf bytes.Buffer
+			if err := tmpl.ExecuteTemplate(&buf, "base", data); err != nil {
+				http.Error(w, "Erreur rendu template", http.StatusInternalServerError)
+				return
+			}
+			buf.WriteTo(w)
 			return
 		}
 
@@ -77,8 +107,10 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 			Name:     "session_id",
 			Value:    sessionID,
 			HttpOnly: true, // Inaccessible depuis JavaScript
+			Secure:   r.TLS != nil,
 			Path:     "/",
 			Expires:  expiresAt,
+			MaxAge:   24 * 60 * 60,
 			SameSite: http.SameSiteLaxMode,
 		})
 

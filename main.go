@@ -37,11 +37,12 @@ func main() {
 	mux.HandleFunc("/", postHandler.Index)
 	mux.HandleFunc("/register", authHandler.Register)
 	mux.HandleFunc("/login", authHandler.Login)
+	mux.HandleFunc("/post/", postHandler.Show)
 
 	// Routes protégées (middleware auth)
 	mux.Handle("/logout", middleware.Auth(db, http.HandlerFunc(authHandler.Logout)))
+	mux.Handle("/profile", middleware.Auth(db, http.HandlerFunc(authHandler.Profile)))
 	mux.Handle("/post/create", middleware.Auth(db, http.HandlerFunc(postHandler.Create)))
-	mux.Handle("/post/", middleware.Auth(db, http.HandlerFunc(postHandler.Show)))
 
 	fmt.Println("Serveur démarré sur http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", mux))

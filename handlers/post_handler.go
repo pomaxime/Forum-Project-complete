@@ -61,7 +61,7 @@ func (h *PostHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Vérifie si l'utilisateur est connecté (pour afficher les boutons Create/Logout)
-	userID := middleware.GetUserID(r)
+	userID := middleware.GetUserIDFromCookie(w, h.db, r)
 	tmpl.Execute(w, map[string]interface{}{
 		"Posts":    posts,
 		"LoggedIn": userID != 0,
@@ -132,5 +132,13 @@ func (h *PostHandler) Show(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl.Execute(w, p)
+	data := struct {
+		Post       Post
+		IsLoggedIn bool
+	}{
+		Post:       p,
+		IsLoggedIn: middleware.GetUserIDFromCookie(w, h.db, r) != 0,
+	}
+
+	tmpl.Execute(w, data)
 }

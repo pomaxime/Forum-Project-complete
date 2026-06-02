@@ -28,9 +28,11 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 		Name:     "session_id",
 		Value:    "",
 		HttpOnly: true,
+		Secure:   r.TLS != nil,
 		Path:     "/",
 		Expires:  time.Unix(0, 0), // Date dans le passé → suppression immédiate
 		MaxAge:   -1,
+		SameSite: http.SameSiteLaxMode,
 	})
 
 	http.Redirect(w, r, "/login", http.StatusSeeOther)

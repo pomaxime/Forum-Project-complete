@@ -65,6 +65,35 @@ func GetUserID(r *http.Request) int {
 	return userID
 }
 
+// GetUserIDFromCookie vérifie le cookie de session et renvoie le user_id si la session est valide.
+// Si la session est invalide ou expirée, le cookie est effacé.
+func GetUserIDFromCookie(w http.ResponseWriter, db *sql.DB, r *http.Request) int {
+	cookie, err := r.Cookie("session_id")
+	if err != nil {
+		return 0
+	}
+
+	var userID int
+	var expiresAt time.Time
+	err = db.QueryRow(
+		"SELECT user_id, expires_at FROM sessions WHERE id = ?",
+		cookie.Value,
+	).Scan(&userID, &expiresAt)
+	if err != nil {
+		clearSessionCookie(w)
+		return 0
+	}
+
+	if time.Now().After(expiresAt) {
+		// Session expirée : suppression côté serveur et client
+		db.Exec("DELETE FROM sessions WHERE id = ?", cookie.Value)
+		clearSessionCookie(w)
+		return 0
+	}
+
+	return userID
+}
+
 // clearSessionCookie expire immédiatement le cookie côté navigateur.
 func clearSessionCookie(w http.ResponseWriter) {
 	http.SetCookie(w, &http.Cookie{
@@ -72,6 +101,8 @@ func clearSessionCookie(w http.ResponseWriter) {
 		Value:    "",
 		HttpOnly: true,
 		Path:     "/",
+		Expires:  time.Unix(0, 0),
 		MaxAge:   -1,
+		SameSite: http.SameSiteLaxMode,
 	})
 }

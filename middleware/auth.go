@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"net/http"
+	"net/url"
 	"time"
 )
 
@@ -18,7 +19,8 @@ func Auth(db *sql.DB, next http.Handler) http.Handler {
 		// 1. Lecture du cookie
 		cookie, err := r.Cookie("session_id")
 		if err != nil {
-			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			loginURL := "/login?next=" + url.QueryEscape(r.URL.RequestURI())
+			http.Redirect(w, r, loginURL, http.StatusSeeOther)
 			return
 		}
 
@@ -33,7 +35,8 @@ func Auth(db *sql.DB, next http.Handler) http.Handler {
 		if err == sql.ErrNoRows {
 			// Session inconnue
 			clearSessionCookie(w)
-			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			loginURL := "/login?next=" + url.QueryEscape(r.URL.RequestURI())
+			http.Redirect(w, r, loginURL, http.StatusSeeOther)
 			return
 		}
 		if err != nil {
@@ -46,7 +49,8 @@ func Auth(db *sql.DB, next http.Handler) http.Handler {
 			// Session expirée : on la supprime de la BDD
 			db.Exec("DELETE FROM sessions WHERE id = ?", cookie.Value)
 			clearSessionCookie(w)
-			http.Redirect(w, r, "/login?expired=1", http.StatusSeeOther)
+			loginURL := "/login?expired=1&next=" + url.QueryEscape(r.URL.RequestURI())
+			http.Redirect(w, r, loginURL, http.StatusSeeOther)
 			return
 		}
 

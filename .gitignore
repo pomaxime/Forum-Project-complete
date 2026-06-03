@@ -1,30 +1,14 @@
 # =========================
-# GO
+# Project-specific ignores
 # =========================
-*.exe
-*.exe~
-*.dll
-*.so
-*.dylib
-*.test
-*.out
+# Keep only patterns that apply to this repository
 
-# Binary folders
-bin/
-build/
-dist/
-
-# Go workspace
-go.work
-go.work.sum
-
-# Dependency directories
-vendor/
-
-# Coverage
+# Go coverage and test artifacts
 coverage.out
-coverage.html
 *.coverprofile
+
+# Dependency directory (if you vendor deps locally)
+vendor/
 
 # Logs
 *.log
@@ -32,9 +16,13 @@ coverage.html
 # =========================
 # DATABASE
 # =========================
+# Ignore any sqlite files
 *.db
 *.sqlite
 *.sqlite3
+
+# Project DB (explicit)
+/database.db
 database/forum.db
 
 # =========================

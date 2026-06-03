@@ -3,10 +3,12 @@
     <nav>
         <a href="/">Accueil</a>
 
-        {{if .User}}
-            <a href="/create">Créer un post</a>
+        {{if .IsLoggedIn}}
+            <a href="/post/create">Créer un post</a>
             <a href="/profile">Profil</a>
-            <a href="/logout">Logout</a>
+            <form action="/logout" method="POST" style="display:inline; margin:0;">
+                <button type="submit">Déconnexion</button>
+            </form>
         {{else}}
             <a href="/login">Login</a>
             <a href="/register">Register</a>

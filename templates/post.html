@@ -2,52 +2,18 @@
 {{with .Post}}
 <div class="post-card">
     <div class="post-meta">
-        {{.Author}}
-        {{if .Category}} · <span class="badge">{{.Category}}</span>{{end}}
-        · {{.CreatedAt}}
+        <span class="post-author">@{{.Username}}</span>
+        · {{.CreatedAt.Format "02/01/2006 à 15:04"}}
     </div>
     <h1>{{.Title}}</h1>
     <p style="margin:1rem 0;color:#444">{{.Content}}</p>
-
-    <div class="post-footer">
-        <form method="POST" action="/like" style="display:inline">
-            <input type="hidden" name="post_id" value="{{.ID}}">
-            <button type="submit">👍 {{.Likes}}</button>
-        </form>
-        <form method="POST" action="/dislike" style="display:inline">
-            <input type="hidden" name="post_id" value="{{.ID}}">
-            <button type="submit">👎 {{.Dislikes}}</button>
-        </form>
-        {{if $.User}}
-        <div class="post-actions">
-            <a href="/edit?id={{.ID}}" class="btn btn-ghost">Éditer</a>
-            <a href="/delete?id={{.ID}}" class="btn btn-danger">Supprimer</a>
-        </div>
-        {{end}}
-    </div>
 </div>
 
-<h2 style="margin:1.5rem 0 0.75rem">Commentaires ({{len .Comments}})</h2>
-
-<div class="comment-list">
-    {{range .Comments}}
-    <div class="comment-item">
-        <div class="comment-author">{{.Author}}</div>
-        {{.Content}}
-    </div>
-    {{else}}
-    <p style="color:#888">Aucun commentaire.</p>
+<div style="margin-top:1rem; display:flex; gap:0.5rem; align-items:center;">
+    <a href="/" class="btn btn-ghost">Retour</a>
+    {{if $.IsLoggedIn}}
+    <a href="/post/create" class="btn btn-primary">Créer un post</a>
     {{end}}
 </div>
-
-{{if $.User}}
-<form method="POST" action="/comment" class="comment-form">
-    <input type="hidden" name="post_id" value="{{.ID}}">
-    <input name="content" placeholder="Commenter..." required>
-    <button type="submit">Envoyer</button>
-</form>
-{{else}}
-<p style="margin-top:1rem;color:#888"><a href="/login">Connectez-vous</a> pour commenter.</p>
-{{end}}
 {{end}}
 {{end}}

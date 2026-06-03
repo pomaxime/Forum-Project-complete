@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reddick</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <header class="navbar">
+        <div class="navbar-brand">Reddick</div>
+        <nav>
+            {{if .LoggedIn}}
+            <a href="/post/create" class="btn btn-primary">Nouveau post</a>
+            <form method="POST" action="/logout" style="display:inline">
+                <button type="submit" class="btn btn-outline">Déconnexion</button>
+            </form>
+            {{else}}
+            <a href="/login" class="btn btn-outline">Connexion</a>
+            <a href="/register" class="btn btn-primary">Inscription</a>
+            {{end}}
+        </nav>
+    </header>
+
+    <div class="container">
+        <h1>Derniers posts</h1>
+
+        {{if .Posts}}
+        <div class="post-list">
+            {{range .Posts}}
+            <div class="post-card">
+                <div class="post-meta">
+                    <span class="post-author">@{{.Username}}</span>
+                    <span class="post-date">{{.CreatedAt.Format "02/01/2006 à 15:04"}}</span>
+                </div>
+                <h2 class="post-title">
+                    <a href="/post/{{.ID}}">{{.Title}}</a>
+                </h2>
+                <p class="post-excerpt">{{.Content}}</p>
+            </div>
+            {{end}}
+        </div>
+        {{else}}
+        <div class="empty-state">
+            <p>Aucun post pour l'instant.</p>
+            {{if .LoggedIn}}
+            <a href="/post/create" class="btn btn-primary">Créer le premier post</a>
+            {{end}}
+        </div>
+        {{end}}
+    </div>
+</body>
+</html>

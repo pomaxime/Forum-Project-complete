@@ -1,3 +1,62 @@
+.auth-page {
+    min-height: calc(100vh - 144px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    background: linear-gradient(180deg, #f8fafc 0%, #f6f7f8 60%, #f6f7f8 100%);
+}
+
+.auth-page .form-card {
+    max-width: 520px;
+    width: 100%;
+    padding: 2.25rem;
+    border-radius: 16px;
+    box-shadow: 0 22px 60px rgba(15, 23, 42, 0.08);
+    border: 1px solid rgba(229, 231, 235, 0.9);
+}
+
+.input-error {
+    border-color: #dc2626 !important;
+    color: #b91c1c !important;
+}
+
+.auth-page .form-card h1 {
+    font-size: 1.75rem;
+    margin-bottom: 1.5rem;
+    color: #111827;
+}
+
+.auth-page .form-card button {
+    width: 100%;
+    padding: 0.9rem 1.1rem;
+    font-size: 1rem;
+    font-weight: 700;
+    border-radius: 9999px;
+    border: none;
+    background: #0079d3;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.auth-page .form-card button:hover {
+    background: #005bb5;
+}
+
+.auth-page .form-footer {
+    margin-top: 1.4rem;
+    color: #6b7280;
+}
+
+.auth-page .form-footer a {
+    color: #0079d3;
+}
+
+.auth-page .form-footer a:hover {
+    text-decoration: underline;
+}
+
 .form-card h1 {
   font-size: 1.3rem;
   margin-bottom: 1rem;

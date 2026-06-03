@@ -1,19 +1,10 @@
 {{define "content"}}
 <h1>Nouveau post</h1>
 <div class="form-card" style="max-width:600px;margin:1rem 0">
-    <form method="POST" action="/create">
+    <form method="POST" action="/post/create">
         <div class="form-group">
             <label>Titre</label>
             <input type="text" name="title" required>
-        </div>
-        <div class="form-group">
-            <label>Catégorie</label>
-            <select name="category">
-                <option value="">-- Choisir --</option>
-                <option value="tech">Tech</option>
-                <option value="jeux">Jeux</option>
-                <option value="general">Général</option>
-            </select>
         </div>
         <div class="form-group">
             <label>Contenu</label>

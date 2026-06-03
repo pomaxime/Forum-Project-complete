@@ -4,7 +4,9 @@
 <div class="form-card">
     <p><strong>Nom d'utilisateur :</strong> {{.Username}}</p>
     <p style="margin-top:0.5rem"><strong>Email :</strong> {{.Email}}</p>
-    <a href="/logout" class="btn btn-ghost" style="margin-top:1rem">Se déconnecter</a>
+    <form action="/logout" method="POST" style="display:inline; margin-top:1rem;">
+        <button type="submit" class="btn btn-ghost">Se déconnecter</button>
+    </form>
 </div>
 {{end}}
 {{end}}

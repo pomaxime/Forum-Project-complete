@@ -30,7 +30,12 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 
 		// Validation des champs
 		if err := utils.ValidateRegister(username, email, password); err != nil {
-			tmpl.ExecuteTemplate(w, "base", map[string]string{"Error": err.Error()})
+			tmpl.ExecuteTemplate(w, "base", map[string]string{
+				"Error":    err.Error(),
+				"Username": username,
+				"Email":    email,
+				"Password": password,
+			})
 			return
 		}
 
@@ -49,11 +54,23 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			// Vérifie si l'email ou le username est déjà utilisé
 			if strings.Contains(err.Error(), "UNIQUE constraint failed: users.email") {
-				tmpl.ExecuteTemplate(w, "base", map[string]string{"Error": "Cet e-mail est déjà utilisé"})
+				tmpl.ExecuteTemplate(w, "base", map[string]string{
+					"Error":      "Cet e-mail est déjà utilisé",
+					"Username":   username,
+					"Email":      email,
+					"Password":   password,
+					"EmailClass": "input-error",
+				})
 				return
 			}
 			if strings.Contains(err.Error(), "UNIQUE constraint failed: users.username") {
-				tmpl.ExecuteTemplate(w, "base", map[string]string{"Error": "Ce nom d'utilisateur est déjà pris"})
+				tmpl.ExecuteTemplate(w, "base", map[string]string{
+					"Error":         "Ce nom d'utilisateur est déjà pris",
+					"Username":      username,
+					"Email":         email,
+					"Password":      password,
+					"UsernameClass": "input-error",
+				})
 				return
 			}
 			http.Error(w, "Erreur interne du serveur", http.StatusInternalServerError)

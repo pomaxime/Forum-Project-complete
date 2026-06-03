@@ -16,6 +16,11 @@
     border: 1px solid rgba(229, 231, 235, 0.9);
 }
 
+.input-error {
+    border-color: #dc2626 !important;
+    color: #b91c1c !important;
+}
+
 .auth-page .form-card h1 {
     font-size: 1.75rem;
     margin-bottom: 1.5rem;

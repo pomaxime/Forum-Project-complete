@@ -4,7 +4,13 @@
   padding: 0;
 }
 
+html {
+  min-height: 100%;
+}
+
 body {
+  display: flex;
+  flex-direction: column;
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background: #f4f4f4;
   color: #111827;
@@ -45,9 +51,27 @@ header.navbar nav {
   align-items: center;
   gap: 0.75rem;
   flex-wrap: wrap;
+  width: 100%;
+}
+
+header.navbar nav .nav-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+header.navbar nav .nav-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+
+header.navbar nav form {
+  display: inline-flex;
 }
 
 body > main {
+  flex: 1;
   width: 100%;
   max-width: 1120px;
   margin: 0 auto;
@@ -105,6 +129,14 @@ footer {
   background: #fff;
   border: 1px solid #e2e8f0;
   border-radius: 16px;
+}
+
+.form-card {
+  margin: 1rem auto;
+}
+
+.form-card--centered {
+  max-width: 600px;
 }
 
 .sidebar-card {

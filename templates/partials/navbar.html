@@ -1,15 +1,24 @@
 {{define "navbar"}}
-<header>
+<header class="navbar">
     <nav>
-        <a href="/">Accueil</a>
+        <div class="nav-left">
+            <a href="/" class="btn btn-ghost">Accueil</a>
 
-        {{if .User}}
-            <a href="/create">Créer un post</a>
-            <a href="/profile">Profil</a>
-            <a href="/logout">Logout</a>
-        {{else}}
-            <a href="/login">Login</a>
-            <a href="/register">Register</a>
+            {{if .IsLoggedIn}}
+                <a href="/post/create" class="btn btn-primary">Créer un post</a>
+                <a href="/profile" class="btn btn-ghost">Profil</a>
+            {{else}}
+                <a href="/login" class="btn btn-ghost">Login</a>
+                <a href="/register" class="btn btn-primary">Register</a>
+            {{end}}
+        </div>
+
+        {{if .IsLoggedIn}}
+        <div class="nav-right">
+            <form action="/logout" method="POST">
+                <button type="submit" class="btn btn-outline">Déconnexion</button>
+            </form>
+        </div>
         {{end}}
     </nav>
 </header>

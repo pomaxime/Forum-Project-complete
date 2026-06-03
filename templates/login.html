@@ -11,6 +11,9 @@
                 <label>Mot de passe</label>
                 <input type="password" name="password" required>
             </div>
+            {{if .Next}}
+            <input type="hidden" name="next" value="{{.Next}}">
+            {{end}}
             <button type="submit">Se connecter</button>
         </form>
         <p class="form-footer">Pas de compte ? <a href="/register">S'inscrire</a></p>

@@ -27,8 +27,10 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodGet:
+		next := r.URL.Query().Get("next")
 		data := models.TemplateData{
 			IsLoggedIn: middleware.GetUserIDFromCookie(w, h.db, r) != 0,
+			Next:       next,
 		}
 
 		if r.URL.Query().Get("registered") == "1" {
@@ -88,6 +90,11 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		next := strings.TrimSpace(r.FormValue("next"))
+		if next == "" || !strings.HasPrefix(next, "/") {
+			next = "/"
+		}
+
 		// Création d'un UUID pour la session
 		sessionID := uuid.New().String()
 		expiresAt := time.Now().Add(24 * time.Hour)
@@ -114,7 +121,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 			SameSite: http.SameSiteLaxMode,
 		})
 
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Redirect(w, r, next, http.StatusSeeOther)
 
 	default:
 		http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)

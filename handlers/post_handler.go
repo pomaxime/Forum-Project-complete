@@ -133,8 +133,8 @@ func (h *PostHandler) Index(w http.ResponseWriter, r *http.Request) {
 
 	userID := middleware.GetUserIDFromCookie(w, h.db, r)
 	data := IndexData{
-		TemplateData:    models.TemplateData{IsLoggedIn: userID != 0},
-		Posts:           posts,
+		TemplateData:     models.TemplateData{IsLoggedIn: userID != 0},
+		Posts:            posts,
 		SelectedCategory: category,
 	}
 	tmpl.ExecuteTemplate(w, "base", data)
@@ -154,8 +154,8 @@ func (h *PostHandler) Create(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		data := CreatePostData{
 			TemplateData: models.TemplateData{IsLoggedIn: true},
-			Category:      "general",
-			Categories:    postCategoryOptions,
+			Category:     "general",
+			Categories:   postCategoryOptions,
 		}
 		tmpl.ExecuteTemplate(w, "base", data)
 
@@ -169,10 +169,10 @@ func (h *PostHandler) Create(w http.ResponseWriter, r *http.Request) {
 
 		data := CreatePostData{
 			TemplateData: models.TemplateData{IsLoggedIn: true},
-			Title:         title,
-			Content:       content,
-			Category:      category,
-			Categories:    postCategoryOptions,
+			Title:        title,
+			Content:      content,
+			Category:     category,
+			Categories:   postCategoryOptions,
 		}
 
 		if !allowedPostCategories[category] {

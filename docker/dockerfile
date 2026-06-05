@@ -1,0 +1,36 @@
+# Étape 1 : Build de l'application Go
+FROM golang:1.22 AS builder
+
+WORKDIR /app
+
+# Copier les fichiers de dépendances
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copier tout le projet
+COPY . .
+
+# Compiler l'application (point d'entrée = cmd/server/main.go)
+RUN go build -o forum ./cmd/server
+
+# Étape 2 : Image finale légère
+FROM debian:stable-slim
+
+WORKDIR /app
+
+# Installer SQLite
+RUN apt-get update && apt-get install -y sqlite3 && apt-get clean
+
+# Copier l'exécutable compilé
+COPY --from=builder /app/forum .
+
+# Copier les ressources nécessaires
+COPY templates ./templates
+COPY static ./static
+COPY database ./database
+
+# Exposer le port utilisé par le serveur
+EXPOSE 8080
+
+# Lancer l'application
+CMD ["./forum"]

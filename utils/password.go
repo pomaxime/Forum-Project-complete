@@ -6,7 +6,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// Génère un hash bcrypt à partir d'un mdp.
 func HashPassword(password string) (string, error) {
 	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
@@ -15,7 +14,6 @@ func HashPassword(password string) (string, error) {
 	return string(hashed), nil
 }
 
-// Compare mdp avec un hash bcrypt.
 func CheckPassword(hash, password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 }

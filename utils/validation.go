@@ -8,7 +8,6 @@ import (
 
 var emailRegex = regexp.MustCompile(`^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$`)
 
-// ValidateRegister vérifie les champs du formulaire d'inscription.
 func ValidateRegister(username, email, password string) error {
 	username = strings.TrimSpace(username)
 	email = strings.TrimSpace(email)
@@ -28,7 +27,6 @@ func ValidateRegister(username, email, password string) error {
 	return nil
 }
 
-// ValidateLogin vérifie les champs du formulaire de connexion.
 func ValidateLogin(email, password string) error {
 	if strings.TrimSpace(email) == "" || password == "" {
 		return errors.New("tous les champs sont obligatoires")
@@ -36,7 +34,6 @@ func ValidateLogin(email, password string) error {
 	return nil
 }
 
-// ValidatePost vérifie les champs d'un nouveau post.
 func ValidatePost(title, content string) error {
 	title = strings.TrimSpace(title)
 	content = strings.TrimSpace(content)

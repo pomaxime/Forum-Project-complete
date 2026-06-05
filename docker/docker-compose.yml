@@ -1,0 +1,13 @@
+version: "3.9"
+
+services:
+  forum:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: forum_app
+    ports:
+      - "8080:8080"
+    volumes:
+      - ../database/forum.db:/app/database/forum.db
+    restart: unless-stopped

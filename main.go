@@ -23,6 +23,7 @@ func main() {
 
 	authHandler := handlers.NewAuthHandler(db)
 	postHandler := handlers.NewPostHandler(db)
+	likeHandler := handlers.NewLikeHandler(db)
 
 	mux := http.NewServeMux()
 
@@ -37,6 +38,10 @@ func main() {
 
 	// Routes protégées (middleware auth)
 	mux.Handle("/comment", middleware.Auth(db, http.HandlerFunc(postHandler.Comment)))
+	mux.Handle("/comment/like", middleware.Auth(db, http.HandlerFunc(likeHandler.LikeComment)))
+	mux.Handle("/comment/dislike", middleware.Auth(db, http.HandlerFunc(likeHandler.DislikeComment)))
+	mux.Handle("/like", middleware.Auth(db, http.HandlerFunc(likeHandler.Like)))
+	mux.Handle("/dislike", middleware.Auth(db, http.HandlerFunc(likeHandler.Dislike)))
 	mux.Handle("/logout", middleware.Auth(db, http.HandlerFunc(authHandler.Logout)))
 	mux.Handle("/profile", middleware.Auth(db, http.HandlerFunc(authHandler.Profile)))
 	mux.Handle("/post/create", middleware.Auth(db, http.HandlerFunc(postHandler.Create)))

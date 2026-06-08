@@ -9,4 +9,6 @@ type Comment struct {
 	Username  string
 	Content   string
 	CreatedAt time.Time
+	Likes     int
+	Dislikes  int
 }

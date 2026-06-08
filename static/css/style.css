@@ -157,6 +157,13 @@ footer {
   border: 1px solid #e5e7eb;
 }
 
+.sidebar-links a.active {
+  background: #e0f2fe;
+  border-color: #7dd3fc;
+  color: #0369a1;
+  font-weight: 700;
+}
+
 .sidebar-links a:hover {
   background: #e2e8f0;
 }

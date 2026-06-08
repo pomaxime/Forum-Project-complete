@@ -11,25 +11,26 @@
 
 <div class="container">
     <section class="main-column">
-        <div class="filters">
-            <a href="/" class="filter-pill {{if eq .SelectedCategory ""}}active{{end}}">Toutes</a>
-            <a href="/?category=general" class="filter-pill {{if eq .SelectedCategory "general"}}active{{end}}">Général</a>
-            <a href="/?category=tech" class="filter-pill {{if eq .SelectedCategory "tech"}}active{{end}}">Tech</a>
-            <a href="/?category=jeux" class="filter-pill {{if eq .SelectedCategory "jeux"}}active{{end}}">Jeux</a>
-            <a href="/?category=business" class="filter-pill {{if eq .SelectedCategory "business"}}active{{end}}">Business</a>
-            <a href="/?category=écologie" class="filter-pill {{if eq .SelectedCategory "écologie"}}active{{end}}">Écologie</a>
-            <a href="/?category=santé" class="filter-pill {{if eq .SelectedCategory "santé"}}active{{end}}">Santé</a>
-            <a href="/?category=sport" class="filter-pill {{if eq .SelectedCategory "sport"}}active{{end}}">Sport</a>
-            <a href="/?category=culture" class="filter-pill {{if eq .SelectedCategory "culture"}}active{{end}}">Culture</a>
-            <a href="/?category=éducation" class="filter-pill {{if eq .SelectedCategory "éducation"}}active{{end}}">Éducation</a>
-        </div>
-
         {{if .Posts}}
         <div class="post-list">
             {{range .Posts}}
             <div class="post-card">
                 <div class="post-card-top">
-                    <span class="post-score">0</span>
+                    <div class="post-score">
+                        {{if .CanReact}}
+                        <form method="POST" action="/like" class="reaction-form">
+                            <input type="hidden" name="post_id" value="{{.ID}}">
+                            <button type="submit" class="btn btn-ghost">👍 {{.Likes}}</button>
+                        </form>
+                        <form method="POST" action="/dislike" class="reaction-form">
+                            <input type="hidden" name="post_id" value="{{.ID}}">
+                            <button type="submit" class="btn btn-ghost">👎 {{.Dislikes}}</button>
+                        </form>
+                        {{else}}
+                        <span>👍 {{.Likes}}</span>
+                        <span>👎 {{.Dislikes}}</span>
+                        {{end}}
+                    </div>
                     <div class="post-card-body">
                         <div class="post-meta">
                             <span>@{{.Username}}</span>
@@ -60,15 +61,16 @@
         <div class="sidebar-card">
             <h2>Catégories</h2>
             <nav class="sidebar-links">
-                <a href="/?category=general">Général</a>
-                <a href="/?category=tech">Tech</a>
-                <a href="/?category=jeux">Jeux</a>
-                <a href="/?category=business">Business</a>
-                <a href="/?category=écologie">Écologie</a>
-                <a href="/?category=santé">Santé</a>
-                <a href="/?category=sport">Sport</a>
-                <a href="/?category=culture">Culture</a>
-                <a href="/?category=éducation">Éducation</a>
+                <a href="/" {{if eq .SelectedCategory ""}}class="active"{{end}}>Toutes</a>
+                <a href="/?category=general" {{if eq .SelectedCategory "general"}}class="active"{{end}}>Général</a>
+                <a href="/?category=tech" {{if eq .SelectedCategory "tech"}}class="active"{{end}}>Tech</a>
+                <a href="/?category=jeux" {{if eq .SelectedCategory "jeux"}}class="active"{{end}}>Jeux</a>
+                <a href="/?category=business" {{if eq .SelectedCategory "business"}}class="active"{{end}}>Business</a>
+                <a href="/?category=écologie" {{if eq .SelectedCategory "écologie"}}class="active"{{end}}>Écologie</a>
+                <a href="/?category=santé" {{if eq .SelectedCategory "santé"}}class="active"{{end}}>Santé</a>
+                <a href="/?category=sport" {{if eq .SelectedCategory "sport"}}class="active"{{end}}>Sport</a>
+                <a href="/?category=culture" {{if eq .SelectedCategory "culture"}}class="active"{{end}}>Culture</a>
+                <a href="/?category=éducation" {{if eq .SelectedCategory "éducation"}}class="active"{{end}}>Éducation</a>
             </nav>
         </div>
         <div class="sidebar-card sidebar-note">

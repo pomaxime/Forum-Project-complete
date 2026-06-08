@@ -30,26 +30,21 @@
                         <span>👍 {{.Likes}}</span>
                         <span>👎 {{.Dislikes}}</span>
                         {{end}}
+                        <div style="margin-top: 0.5rem;">
+                            <a href="/post/{{.ID}}" class="btn btn-ghost-post">{{if $.IsLoggedIn}}💬 Commenter{{else}}👁 Voir{{end}}</a>
+                            {{if $.IsLoggedIn}}
+                            <br><button type="button" class="btn btn-ghost-post" data-share-url="/post/{{.ID}}" onclick="copyShareLink(this)">🔗 Partager</button>
+                            {{end}}
+                        </div>
                     </div>
                     <div class="post-card-body">
-                        <div class="post-meta">
-                            <span>@{{.Username}}</span>
-                            <span class="dot">•</span>
-                            <span>{{.CreatedAt.Format "02/01/2006 à 15:04"}}</span>
+                        <div class="footer-meta">
+                            <span class="tag">{{.Category}}</span>
+                            <span class="comment-count">💬 {{.CommentsCount}}</span>
                         </div>
                         <h2 class="post-title"><a href="/post/{{.ID}}">{{.Title}}</a></h2>
                         <p class="post-excerpt">{{.Content}}</p>
                         <div class="post-card-footer">
-                            <div class="footer-meta">
-                                <span class="tag">{{.Category}}</span>
-                                <span class="comment-count">💬 {{.CommentsCount}}</span>
-                            </div>
-                            <div class="footer-actions">
-                                <a href="/post/{{.ID}}" class="btn btn-ghost">{{if $.IsLoggedIn}}Commenter{{else}}Voir{{end}}</a>
-                                {{if $.IsLoggedIn}}
-                                <button type="button" class="btn btn-ghost" data-share-url="/post/{{.ID}}" onclick="copyShareLink(this)">🔗 Partager</button>
-                                {{end}}
-                            </div>
                         </div>
                     </div>
                 </div>

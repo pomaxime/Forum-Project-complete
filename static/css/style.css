@@ -246,6 +246,16 @@ footer {
   border: 1px solid #d1d5db;
 }
 
+.btn-ghost-post {
+  background: #f8fafc;
+  color: #111827;
+  border: 1px solid #d1d5db;
+  padding: 5px;
+  margin-bottom: 8px;
+  margin-right: 10px;
+
+}
+
 .btn-ghost:hover {
   background: #e2e8f0;
 }
@@ -323,6 +333,7 @@ footer {
 
 .tag,
 .post-category {
+  position: static;
   display: inline-flex;
   padding: 0.28rem 0.65rem;
   border-radius: 9999px;

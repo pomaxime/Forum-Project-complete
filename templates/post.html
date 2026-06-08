@@ -15,6 +15,8 @@
                 <span>@{{.Username}}</span>
                 <span class="dot">•</span>
                 <span>{{.CreatedAt.Format "02/01/2006 à 15:04"}}</span>
+            </div>
+            <div style="margin-top:0.5rem; margin-bottom:1rem;">
                 <span class="tag post-category">{{.Category}}</span>
             </div>
             <h1 class="post-title post-title-large">{{.Title}}</h1>
@@ -35,8 +37,11 @@
                     <span>👎 {{$.Dislikes}}</span>
                 </div>
                 {{end}}
+            </div>
+            <div style="margin-top:1rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
                 {{if $.IsLoggedIn}}
-                <button type="button" class="btn btn-ghost" data-share-url="/post/{{.ID}}" onclick="copyShareLink(this)">🔗 Partager</button>
+                <button type="button" class="btn btn-ghost" style="border:1px solid #d1d5db;">💬 Commenter</button>
+                <button type="button" class="btn btn-ghost" data-share-url="/post/{{.ID}}" onclick="copyShareLink(this)" style="border:1px solid #d1d5db;">🔗 Partager</button>
                 {{end}}
             </div>
         </article>

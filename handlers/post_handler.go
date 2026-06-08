@@ -21,16 +21,17 @@ func NewPostHandler(db *sql.DB) *PostHandler {
 }
 
 type Post struct {
-	ID        int
-	UserID    int
-	Username  string
-	Title     string
-	Content   string
-	Category  string
-	CreatedAt time.Time
-	Likes     int
-	Dislikes  int
-	CanReact  bool
+	ID            int
+	UserID        int
+	Username      string
+	Title         string
+	Content       string
+	Category      string
+	CreatedAt     time.Time
+	Likes         int
+	Dislikes      int
+	CommentsCount int
+	CanReact      bool
 }
 
 type CategoryOption struct {
@@ -100,7 +101,8 @@ func (h *PostHandler) Index(w http.ResponseWriter, r *http.Request) {
 	category := strings.TrimSpace(r.URL.Query().Get("category"))
 	query := `SELECT p.id, p.user_id, u.username, p.title, p.content, p.category, p.created_at,
 		(SELECT COUNT(*) FROM likes WHERE post_id = p.id) AS likes,
-		(SELECT COUNT(*) FROM dislikes WHERE post_id = p.id) AS dislikes
+		(SELECT COUNT(*) FROM dislikes WHERE post_id = p.id) AS dislikes,
+		(SELECT COUNT(*) FROM comments WHERE post_id = p.id) AS comments_count
 		FROM posts p
 		JOIN users u ON p.user_id = u.id`
 
@@ -129,7 +131,7 @@ func (h *PostHandler) Index(w http.ResponseWriter, r *http.Request) {
 	var posts []Post
 	for rows.Next() {
 		var p Post
-		if err := rows.Scan(&p.ID, &p.UserID, &p.Username, &p.Title, &p.Content, &p.Category, &p.CreatedAt, &p.Likes, &p.Dislikes); err != nil {
+		if err := rows.Scan(&p.ID, &p.UserID, &p.Username, &p.Title, &p.Content, &p.Category, &p.CreatedAt, &p.Likes, &p.Dislikes, &p.CommentsCount); err != nil {
 			continue
 		}
 		p.CanReact = userID != 0 && userID != p.UserID

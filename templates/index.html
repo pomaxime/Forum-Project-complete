@@ -40,7 +40,16 @@
                         <h2 class="post-title"><a href="/post/{{.ID}}">{{.Title}}</a></h2>
                         <p class="post-excerpt">{{.Content}}</p>
                         <div class="post-card-footer">
-                            <span class="tag">{{.Category}}</span>
+                            <div class="footer-meta">
+                                <span class="tag">{{.Category}}</span>
+                                <span class="comment-count">💬 {{.CommentsCount}}</span>
+                            </div>
+                            <div class="footer-actions">
+                                <a href="/post/{{.ID}}" class="btn btn-ghost">{{if $.IsLoggedIn}}Commenter{{else}}Voir{{end}}</a>
+                                {{if $.IsLoggedIn}}
+                                <button type="button" class="btn btn-ghost" data-share-url="/post/{{.ID}}" onclick="copyShareLink(this)">🔗 Partager</button>
+                                {{end}}
+                            </div>
                         </div>
                     </div>
                 </div>

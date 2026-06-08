@@ -35,6 +35,9 @@
                     <span>👎 {{$.Dislikes}}</span>
                 </div>
                 {{end}}
+                {{if $.IsLoggedIn}}
+                <button type="button" class="btn btn-ghost" data-share-url="/post/{{.ID}}" onclick="copyShareLink(this)">🔗 Partager</button>
+                {{end}}
             </div>
         </article>
         {{end}}

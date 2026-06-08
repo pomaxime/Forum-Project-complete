@@ -277,10 +277,11 @@ func (h *PostHandler) Show(w http.ResponseWriter, r *http.Request) {
 	var comments []Comment
 	for commentsRows.Next() {
 		var comment Comment
-		if err := commentsRows.Scan(&comment.ID, &comment.UserID, &comment.Username, &comment.Content, &comment.CreatedAt, &comment.Likes, &comment.Dislikes); err != nil {
+		var commentUserID int
+		if err := commentsRows.Scan(&comment.ID, &commentUserID, &comment.Username, &comment.Content, &comment.CreatedAt, &comment.Likes, &comment.Dislikes); err != nil {
 			continue
 		}
-		comment.CanReact = currentUserID != 0 && currentUserID != comment.UserID
+		comment.CanReact = currentUserID != 0 && currentUserID != commentUserID
 		comments = append(comments, comment)
 	}
 

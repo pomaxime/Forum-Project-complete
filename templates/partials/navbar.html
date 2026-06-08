@@ -1,19 +1,6 @@
 {{define "navbar"}}
 <header class="navbar">
     <nav>
-<<<<<<< HEAD
-        <a href="/" class="btn btn-ghost">Accueil</a>
-
-        {{if .IsLoggedIn}}
-            <a href="/post/create" class="btn btn-primary">Créer un post</a>
-            <a href="/profile" class="btn btn-ghost">Profil</a>
-            <form action="/logout" method="POST" style="display:inline; margin:0;">
-                <button type="submit" class="btn btn-outline">Déconnexion</button>
-            </form>
-        {{else}}
-            <a href="/login" class="btn btn-ghost">Login</a>
-            <a href="/register" class="btn btn-primary">Register</a>
-=======
         <div class="nav-left">
             <a href="/" class="btn btn-ghost">Accueil</a>
 
@@ -32,7 +19,6 @@
                 <button type="submit" class="btn btn-outline">Déconnexion</button>
             </form>
         </div>
->>>>>>> origin/templates
         {{end}}
     </nav>
 </header>

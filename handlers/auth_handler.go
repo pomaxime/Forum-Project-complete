@@ -9,17 +9,14 @@ import (
 	"forum/models"
 )
 
-// AuthHandler regroupe tous les handlers d'authentification.
 type AuthHandler struct {
 	db *sql.DB
 }
 
-// NewAuthHandler crée un AuthHandler avec la connexion DB fournie.
 func NewAuthHandler(db *sql.DB) *AuthHandler {
 	return &AuthHandler{db: db}
 }
 
-// Profile affiche la page de profil de l'utilisateur connecté.
 func (h *AuthHandler) Profile(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles(
 		"templates/base.html",

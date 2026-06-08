@@ -9,7 +9,6 @@ import (
 	"forum/utils"
 )
 
-// RegisterHandler gère l'inscription des nouveaux utilisateurs.
 func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles(
 		"templates/base.html",
@@ -28,39 +27,51 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		email := strings.TrimSpace(r.FormValue("email"))
 		password := r.FormValue("password")
 
-		// Validation des champs
 		if err := utils.ValidateRegister(username, email, password); err != nil {
-			tmpl.ExecuteTemplate(w, "base", map[string]string{"Error": err.Error()})
+			tmpl.ExecuteTemplate(w, "base", map[string]string{
+				"Error":    err.Error(),
+				"Username": username,
+				"Email":    email,
+				"Password": password,
+			})
 			return
 		}
 
-		// Hash du mot de passe
 		hashedPassword, err := utils.HashPassword(password)
 		if err != nil {
 			http.Error(w, "Erreur interne du serveur", http.StatusInternalServerError)
 			return
 		}
 
-		// Insertion en base de données (requête préparée → protection SQL Injection)
 		_, err = h.db.Exec(
 			"INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
 			username, email, hashedPassword,
 		)
 		if err != nil {
-			// Vérifie si l'email ou le username est déjà utilisé
 			if strings.Contains(err.Error(), "UNIQUE constraint failed: users.email") {
-				tmpl.ExecuteTemplate(w, "base", map[string]string{"Error": "Cet e-mail est déjà utilisé"})
+				tmpl.ExecuteTemplate(w, "base", map[string]string{
+					"Error":      "Cet e-mail est déjà utilisé",
+					"Username":   username,
+					"Email":      email,
+					"Password":   password,
+					"EmailClass": "input-error",
+				})
 				return
 			}
 			if strings.Contains(err.Error(), "UNIQUE constraint failed: users.username") {
-				tmpl.ExecuteTemplate(w, "base", map[string]string{"Error": "Ce nom d'utilisateur est déjà pris"})
+				tmpl.ExecuteTemplate(w, "base", map[string]string{
+					"Error":         "Ce nom d'utilisateur est déjà pris",
+					"Username":      username,
+					"Email":         email,
+					"Password":      password,
+					"UsernameClass": "input-error",
+				})
 				return
 			}
 			http.Error(w, "Erreur interne du serveur", http.StatusInternalServerError)
 			return
 		}
 
-		// Inscription réussie → redirection vers la page de login
 		http.Redirect(w, r, "/login?registered=1", http.StatusSeeOther)
 
 	default:
@@ -68,8 +79,6 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// getUserByEmail récupère un utilisateur par son email.
-// Retourne sql.ErrNoRows si aucun utilisateur trouvé.
 func getUserByEmail(db *sql.DB, email string) (int, string, string, error) {
 	var id int
 	var username, hashedPassword string

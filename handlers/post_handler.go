@@ -8,43 +8,110 @@ import (
 	"time"
 
 	"forum/middleware"
+	"forum/models"
 	"forum/utils"
 )
 
-// PostHandler gère les opérations sur les posts.
 type PostHandler struct {
 	db *sql.DB
 }
 
-// NewPostHandler crée un PostHandler avec la connexion DB fournie.
 func NewPostHandler(db *sql.DB) *PostHandler {
 	return &PostHandler{db: db}
 }
 
-// Post représente un post du forum.
 type Post struct {
 	ID        int
 	Username  string
 	Title     string
 	Content   string
+	Category  string
 	CreatedAt time.Time
 }
 
-// Index affiche la liste de tous les posts (page d'accueil).
+type CategoryOption struct {
+	Value string
+	Label string
+}
+
+type CreatePostData struct {
+	models.TemplateData
+	Title         string
+	Category      string
+	Content       string
+	TitleClass    string
+	CategoryClass string
+	ContentClass  string
+	Categories    []CategoryOption
+}
+
+type IndexData struct {
+	models.TemplateData
+	Posts            []Post
+	SelectedCategory string
+}
+
+type PostPageData struct {
+	models.TemplateData
+	Post     Post
+	Comments []Comment
+}
+
+var postCategoryOptions = []CategoryOption{
+	{Value: "general", Label: "Général"},
+	{Value: "tech", Label: "Tech"},
+	{Value: "jeux", Label: "Jeux"},
+	{Value: "business", Label: "Business"},
+	{Value: "écologie", Label: "Écologie"},
+	{Value: "santé", Label: "Santé"},
+	{Value: "sport", Label: "Sport"},
+	{Value: "culture", Label: "Culture"},
+	{Value: "éducation", Label: "Éducation"},
+}
+
+var allowedPostCategories = make(map[string]bool)
+
+func init() {
+	for _, option := range postCategoryOptions {
+		allowedPostCategories[option.Value] = true
+	}
+}
+
 func (h *PostHandler) Index(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		http.NotFound(w, r)
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("templates/index.html"))
+	tmpl := template.Must(template.ParseFiles(
+		"templates/base.html",
+		"templates/partials/navbar.html",
+		"templates/partials/alerts.html",
+		"templates/partials/footer.html",
+		"templates/index.html",
+	))
 
-	rows, err := h.db.Query(`
-		SELECT p.id, u.username, p.title, p.content, p.created_at
+	category := strings.TrimSpace(r.URL.Query().Get("category"))
+
+	query := `
+		SELECT p.id, u.username, p.title, p.content, p.category, p.created_at
 		FROM posts p
 		JOIN users u ON p.user_id = u.id
-		ORDER BY p.created_at DESC
-	`)
+	`
+	var rows *sql.Rows
+	var err error
+	if category != "" {
+		if !allowedPostCategories[category] {
+			http.Error(w, "Catégorie invalide", http.StatusBadRequest)
+			return
+		}
+		query += " WHERE p.category = ?"
+		query += " ORDER BY p.created_at DESC"
+		rows, err = h.db.Query(query, category)
+	} else {
+		query += " ORDER BY p.created_at DESC"
+		rows, err = h.db.Query(query)
+	}
 	if err != nil {
 		http.Error(w, "Erreur interne du serveur", http.StatusInternalServerError)
 		return
@@ -54,45 +121,81 @@ func (h *PostHandler) Index(w http.ResponseWriter, r *http.Request) {
 	var posts []Post
 	for rows.Next() {
 		var p Post
-		if err := rows.Scan(&p.ID, &p.Username, &p.Title, &p.Content, &p.CreatedAt); err != nil {
+		if err := rows.Scan(&p.ID, &p.Username, &p.Title, &p.Content, &p.Category, &p.CreatedAt); err != nil {
 			continue
 		}
 		posts = append(posts, p)
 	}
 
-	// Vérifie si l'utilisateur est connecté (pour afficher les boutons Create/Logout)
 	userID := middleware.GetUserIDFromCookie(w, h.db, r)
-	tmpl.Execute(w, map[string]interface{}{
-		"Posts":    posts,
-		"LoggedIn": userID != 0,
-	})
+	data := IndexData{
+		TemplateData:     models.TemplateData{IsLoggedIn: userID != 0},
+		Posts:            posts,
+		SelectedCategory: category,
+	}
+	tmpl.ExecuteTemplate(w, "base", data)
 }
 
-// Create gère la création d'un nouveau post (réservé aux utilisateurs connectés).
 func (h *PostHandler) Create(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("templates/create_post.html"))
+	tmpl := template.Must(template.ParseFiles(
+		"templates/base.html",
+		"templates/partials/navbar.html",
+		"templates/partials/alerts.html",
+		"templates/partials/footer.html",
+		"templates/create_post.html",
+	))
 
 	switch r.Method {
 	case http.MethodGet:
-		tmpl.Execute(w, nil)
+		data := CreatePostData{
+			TemplateData: models.TemplateData{IsLoggedIn: true},
+			Category:     "general",
+			Categories:   postCategoryOptions,
+		}
+		tmpl.ExecuteTemplate(w, "base", data)
 
 	case http.MethodPost:
 		title := strings.TrimSpace(r.FormValue("title"))
 		content := strings.TrimSpace(r.FormValue("content"))
+		category := strings.TrimSpace(r.FormValue("category"))
+		if category == "" {
+			category = "general"
+		}
 
-		if err := utils.ValidatePost(title, content); err != nil {
-			tmpl.Execute(w, map[string]string{"Error": err.Error()})
+		data := CreatePostData{
+			TemplateData: models.TemplateData{IsLoggedIn: true},
+			Title:        title,
+			Content:      content,
+			Category:     category,
+			Categories:   postCategoryOptions,
+		}
+
+		if !allowedPostCategories[category] {
+			data.Error = "Catégorie invalide"
+			data.CategoryClass = "input-error"
+			tmpl.ExecuteTemplate(w, "base", data)
 			return
 		}
 
-		// Récupération de l'utilisateur connecté via le contexte
+		if err := utils.ValidatePost(title, content); err != nil {
+			data.Error = err.Error()
+			if strings.Contains(err.Error(), "titre") {
+				data.TitleClass = "input-error"
+			}
+			if strings.Contains(err.Error(), "contenu") {
+				data.ContentClass = "input-error"
+			}
+			if strings.Contains(err.Error(), "obligatoires") {
+				data.TitleClass = "input-error"
+				data.ContentClass = "input-error"
+			}
+			tmpl.ExecuteTemplate(w, "base", data)
+			return
+		}
+
 		userID := middleware.GetUserID(r)
 
-		_, err := h.db.Exec(
-			"INSERT INTO posts (user_id, title, content) VALUES (?, ?, ?)",
-			userID, title, content,
-		)
-		if err != nil {
+		if err := h.createPost(userID, title, content, category); err != nil {
 			http.Error(w, "Erreur interne du serveur", http.StatusInternalServerError)
 			return
 		}
@@ -104,11 +207,23 @@ func (h *PostHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Show affiche un post individuel.
-func (h *PostHandler) Show(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("templates/post.html"))
+func (h *PostHandler) createPost(userID int, title, content, category string) error {
+	_, err := h.db.Exec(
+		"INSERT INTO posts (user_id, title, content, category) VALUES (?, ?, ?, ?)",
+		userID, title, content, category,
+	)
+	return err
+}
 
-	// Extraction de l'ID depuis l'URL : /post/42
+func (h *PostHandler) Show(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles(
+		"templates/base.html",
+		"templates/partials/navbar.html",
+		"templates/partials/alerts.html",
+		"templates/partials/footer.html",
+		"templates/post.html",
+	))
+
 	id := strings.TrimPrefix(r.URL.Path, "/post/")
 	if id == "" {
 		http.NotFound(w, r)
@@ -117,11 +232,11 @@ func (h *PostHandler) Show(w http.ResponseWriter, r *http.Request) {
 
 	var p Post
 	err := h.db.QueryRow(`
-		SELECT p.id, u.username, p.title, p.content, p.created_at
+		SELECT p.id, u.username, p.title, p.content, p.category, p.created_at
 		FROM posts p
 		JOIN users u ON p.user_id = u.id
 		WHERE p.id = ?
-	`, id).Scan(&p.ID, &p.Username, &p.Title, &p.Content, &p.CreatedAt)
+	`, id).Scan(&p.ID, &p.Username, &p.Title, &p.Content, &p.Category, &p.CreatedAt)
 
 	if err == sql.ErrNoRows {
 		http.NotFound(w, r)
@@ -132,13 +247,38 @@ func (h *PostHandler) Show(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := struct {
-		Post       Post
-		IsLoggedIn bool
-	}{
-		Post:       p,
-		IsLoggedIn: middleware.GetUserIDFromCookie(w, h.db, r) != 0,
+	commentsRows, err := h.db.Query(`
+		SELECT c.id, u.username, c.content, c.created_at
+		FROM comments c
+		JOIN users u ON c.user_id = u.id
+		WHERE c.post_id = ?
+		ORDER BY c.created_at ASC
+	`, id)
+	if err != nil {
+		http.Error(w, "Erreur interne du serveur", http.StatusInternalServerError)
+		return
+	}
+	defer commentsRows.Close()
+
+	var comments []Comment
+	for commentsRows.Next() {
+		var comment Comment
+		if err := commentsRows.Scan(&comment.ID, &comment.Username, &comment.Content, &comment.CreatedAt); err != nil {
+			continue
+		}
+		comments = append(comments, comment)
 	}
 
-	tmpl.Execute(w, data)
+	data := PostPageData{
+		TemplateData: models.TemplateData{IsLoggedIn: middleware.GetUserIDFromCookie(w, h.db, r) != 0},
+		Post:         p,
+		Comments:     comments,
+	}
+
+	tmpl.ExecuteTemplate(w, "base", data)
+}
+
+func (h *PostHandler) Categories(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("templates/categories.html"))
+	tmpl.Execute(w, nil)
 }

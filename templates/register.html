@@ -4,16 +4,16 @@
         <h1>Inscription</h1>
         <form method="post" action="/register">
             <div class="form-group">
-                <label>Nom d'utilisateur</label>
-                <input type="text" name="username" required>
+                <label for="username">Nom d'utilisateur</label>
+                <input id="username" type="text" name="username" class="{{.UsernameClass}}" required value="{{.Username}}">
             </div>
             <div class="form-group">
-                <label>Email</label>
-                <input type="email" name="email" required>
+                <label for="email">Email</label>
+                <input id="email" type="email" name="email" class="{{.EmailClass}}" required value="{{.Email}}">
             </div>
             <div class="form-group">
-                <label>Mot de passe</label>
-                <input type="password" name="password" required minlength="8">
+                <label for="password">Mot de passe</label>
+                <input id="password" type="password" name="password" class="{{.PasswordClass}}" required minlength="8" value="{{.Password}}">
             </div>
             <button type="submit">Créer mon compte</button>
         </form>

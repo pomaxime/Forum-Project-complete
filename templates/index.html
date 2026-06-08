@@ -1,53 +1,80 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reddick</title>
-    <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
-    <header class="navbar">
-        <div class="navbar-brand">Reddick</div>
-        <nav>
-            {{if .LoggedIn}}
-            <a href="/post/create" class="btn btn-primary">Nouveau post</a>
-            <form method="POST" action="/logout" style="display:inline">
-                <button type="submit" class="btn btn-outline">Déconnexion</button>
-            </form>
-            {{else}}
-            <a href="/login" class="btn btn-outline">Connexion</a>
-            <a href="/register" class="btn btn-primary">Inscription</a>
-            {{end}}
-        </nav>
-    </header>
-
-    <div class="container">
+{{define "content"}}
+<div class="page-header">
+    <div>
         <h1>Derniers posts</h1>
+        <p class="page-subtitle">Filtre les catégories et découvre les dernières discussions.</p>
+    </div>
+    {{if .IsLoggedIn}}
+    <a href="/post/create" class="btn btn-primary">Créer un post</a>
+    {{end}}
+</div>
+
+<div class="container">
+    <section class="main-column">
+        <div class="filters">
+            <a href="/" class="filter-pill {{if eq .SelectedCategory ""}}active{{end}}">Toutes</a>
+            <a href="/?category=general" class="filter-pill {{if eq .SelectedCategory "general"}}active{{end}}">Général</a>
+            <a href="/?category=tech" class="filter-pill {{if eq .SelectedCategory "tech"}}active{{end}}">Tech</a>
+            <a href="/?category=jeux" class="filter-pill {{if eq .SelectedCategory "jeux"}}active{{end}}">Jeux</a>
+            <a href="/?category=business" class="filter-pill {{if eq .SelectedCategory "business"}}active{{end}}">Business</a>
+            <a href="/?category=écologie" class="filter-pill {{if eq .SelectedCategory "écologie"}}active{{end}}">Écologie</a>
+            <a href="/?category=santé" class="filter-pill {{if eq .SelectedCategory "santé"}}active{{end}}">Santé</a>
+            <a href="/?category=sport" class="filter-pill {{if eq .SelectedCategory "sport"}}active{{end}}">Sport</a>
+            <a href="/?category=culture" class="filter-pill {{if eq .SelectedCategory "culture"}}active{{end}}">Culture</a>
+            <a href="/?category=éducation" class="filter-pill {{if eq .SelectedCategory "éducation"}}active{{end}}">Éducation</a>
+        </div>
 
         {{if .Posts}}
         <div class="post-list">
             {{range .Posts}}
             <div class="post-card">
-                <div class="post-meta">
-                    <span class="post-author">@{{.Username}}</span>
-                    <span class="post-date">{{.CreatedAt.Format "02/01/2006 à 15:04"}}</span>
+                <div class="post-card-top">
+                    <span class="post-score">0</span>
+                    <div class="post-card-body">
+                        <div class="post-meta">
+                            <span>@{{.Username}}</span>
+                            <span class="dot">•</span>
+                            <span>{{.CreatedAt.Format "02/01/2006 à 15:04"}}</span>
+                        </div>
+                        <h2 class="post-title"><a href="/post/{{.ID}}">{{.Title}}</a></h2>
+                        <p class="post-excerpt">{{.Content}}</p>
+                        <div class="post-card-footer">
+                            <span class="tag">{{.Category}}</span>
+                        </div>
+                    </div>
                 </div>
-                <h2 class="post-title">
-                    <a href="/post/{{.ID}}">{{.Title}}</a>
-                </h2>
-                <p class="post-excerpt">{{.Content}}</p>
             </div>
             {{end}}
         </div>
         {{else}}
         <div class="empty-state">
             <p>Aucun post pour l'instant.</p>
-            {{if .LoggedIn}}
+            {{if .IsLoggedIn}}
             <a href="/post/create" class="btn btn-primary">Créer le premier post</a>
             {{end}}
         </div>
         {{end}}
-    </div>
-</body>
-</html>
+    </section>
+
+    <aside class="sidebar">
+        <div class="sidebar-card">
+            <h2>Catégories</h2>
+            <nav class="sidebar-links">
+                <a href="/?category=general">Général</a>
+                <a href="/?category=tech">Tech</a>
+                <a href="/?category=jeux">Jeux</a>
+                <a href="/?category=business">Business</a>
+                <a href="/?category=écologie">Écologie</a>
+                <a href="/?category=santé">Santé</a>
+                <a href="/?category=sport">Sport</a>
+                <a href="/?category=culture">Culture</a>
+                <a href="/?category=éducation">Éducation</a>
+            </nav>
+        </div>
+        <div class="sidebar-card sidebar-note">
+            <h2>À propos</h2>
+            <p>Un forum simple inspiré du style Reddit, avec des posts, des catégories et des commentaires.</p>
+        </div>
+    </aside>
+</div>
+{{end}}

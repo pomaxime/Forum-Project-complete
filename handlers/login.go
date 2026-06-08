@@ -90,6 +90,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 			next = "/"
 		}
 
+		// Création d'un UUID pour la session
 		sessionID := uuid.New().String()
 		expiresAt := time.Now().Add(24 * time.Hour)
 

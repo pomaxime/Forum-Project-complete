@@ -1,19 +1,70 @@
 {{define "content"}}
-{{with .Post}}
-<div class="post-card">
-    <div class="post-meta">
-        <span class="post-author">@{{.Username}}</span>
-        · {{.CreatedAt.Format "02/01/2006 à 15:04"}}
+<div class="page-header single-page-header">
+    <div>
+        <h1>Détails du post</h1>
+        <p class="page-subtitle">Discuter, réagir et laisser un commentaire sur ce post.</p>
     </div>
-    <h1>{{.Title}}</h1>
-    <p style="margin:1rem 0;color:#444">{{.Content}}</p>
+    <a href="/" class="btn btn-ghost">Retour aux posts</a>
 </div>
 
-<div style="margin-top:1rem; display:flex; gap:0.5rem; align-items:center;">
-    <a href="/" class="btn btn-ghost">Retour</a>
-    {{if $.IsLoggedIn}}
-    <a href="/post/create" class="btn btn-primary">Créer un post</a>
-    {{end}}
+<div class="container">
+    <section class="main-column">
+        {{with .Post}}
+        <article class="post-card post-full-card">
+            <div class="post-meta">
+                <span>@{{.Username}}</span>
+                <span class="dot">•</span>
+                <span>{{.CreatedAt.Format "02/01/2006 à 15:04"}}</span>
+                <span class="tag post-category">{{.Category}}</span>
+            </div>
+            <h1 class="post-title post-title-large">{{.Title}}</h1>
+            <p class="post-content">{{.Content}}</p>
+        </article>
+        {{end}}
+
+        <section class="comments-section">
+            <div class="section-header">
+                <h2>Commentaires</h2>
+                <span class="comment-count">{{len .Comments}}</span>
+            </div>
+
+            {{if .Comments}}
+            <div class="comment-list">
+                {{range .Comments}}
+                <div class="comment-card">
+                    <div class="comment-meta">@{{.Username}} · {{.CreatedAt.Format "02/01/2006 à 15:04"}}</div>
+                    <p>{{.Content}}</p>
+                </div>
+                {{end}}
+            </div>
+            {{else}}
+            <div class="empty-state">
+                <p>Aucun commentaire pour le moment.</p>
+            </div>
+            {{end}}
+
+            {{if .IsLoggedIn}}
+            <form method="POST" action="/comment" class="comment-form">
+                <input type="hidden" name="post_id" value="{{.Post.ID}}">
+                <textarea name="content" placeholder="Ajouter un commentaire" required></textarea>
+                <button type="submit" class="btn btn-primary">Publier le commentaire</button>
+            </form>
+            {{else}}
+            <p class="comment-login-reminder"><a href="/login">Connectez-vous</a> pour laisser un commentaire.</p>
+            {{end}}
+        </section>
+    </section>
+
+    <aside class="sidebar">
+        <div class="sidebar-card">
+            <h2>Actions rapides</h2>
+            <a href="/post/create" class="btn btn-primary">Créer un post</a>
+        </div>
+
+        <div class="sidebar-card sidebar-note">
+            <h2>Astuce</h2>
+            <p>Laisse un commentaire pour engager la discussion et aider la communauté à répondre.</p>
+        </div>
+    </aside>
 </div>
-{{end}}
 {{end}}

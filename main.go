@@ -35,6 +35,7 @@ func main() {
 	mux.HandleFunc("/post/", postHandler.Show)
 	mux.HandleFunc("/categories", postHandler.Categories)
 
+	// Routes protégées (middleware auth)
 	mux.Handle("/comment", middleware.Auth(db, http.HandlerFunc(postHandler.Comment)))
 	mux.Handle("/logout", middleware.Auth(db, http.HandlerFunc(authHandler.Logout)))
 	mux.Handle("/profile", middleware.Auth(db, http.HandlerFunc(authHandler.Profile)))

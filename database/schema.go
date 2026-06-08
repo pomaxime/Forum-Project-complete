@@ -82,3 +82,31 @@ func ensureColumnExists(db *sql.DB, table, column, columnDefinition string) erro
 
 	return nil
 }
+
+func ensureColumnExists(db *sql.DB, table, column, columnDefinition string) error {
+	rows, err := db.Query(fmt.Sprintf("PRAGMA table_info(%s)", table))
+	if err != nil {
+		return fmt.Errorf("impossible de lire les colonnes de %s : %w", table, err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var cid int
+		var name, ctype string
+		var notnull int
+		var dfltValue sql.NullString
+		var pk int
+		if err := rows.Scan(&cid, &name, &ctype, &notnull, &dfltValue, &pk); err != nil {
+			return fmt.Errorf("impossible de lire la définition des colonnes de %s : %w", table, err)
+		}
+		if name == column {
+			return nil
+		}
+	}
+
+	if _, err := db.Exec(fmt.Sprintf("ALTER TABLE %s ADD COLUMN %s %s", table, column, columnDefinition)); err != nil {
+		return fmt.Errorf("impossible d'ajouter la colonne %s à %s : %w", column, table, err)
+	}
+
+	return nil
+}

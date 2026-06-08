@@ -34,6 +34,11 @@ func ValidateLogin(email, password string) error {
 	return nil
 }
 
+func ValidateEmail(email string) bool {
+	email = strings.TrimSpace(email)
+	return emailRegex.MatchString(email)
+}
+
 func ValidatePost(title, content string) error {
 	title = strings.TrimSpace(title)
 	content = strings.TrimSpace(content)

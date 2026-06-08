@@ -8,10 +8,12 @@ import (
 func CreateTables(db *sql.DB) error {
 	queries := []string{
 		`CREATE TABLE IF NOT EXISTS users (
-            id       INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT    NOT NULL UNIQUE,
-            email    TEXT    NOT NULL UNIQUE,
-            password TEXT    NOT NULL
+            id         INTEGER PRIMARY KEY AUTOINCREMENT,
+            username   TEXT    NOT NULL UNIQUE,
+            email      TEXT    NOT NULL UNIQUE,
+            password   TEXT    NOT NULL,
+            avatar_url TEXT    DEFAULT '',
+            gender     TEXT    DEFAULT ''
         )`,
 
 		`CREATE TABLE IF NOT EXISTS sessions (
@@ -85,6 +87,14 @@ func CreateTables(db *sql.DB) error {
 	}
 
 	if err := ensureColumnExists(db, "posts", "category", "TEXT NOT NULL DEFAULT 'general'"); err != nil {
+		return err
+	}
+
+	if err := ensureColumnExists(db, "users", "avatar_url", "TEXT DEFAULT ''"); err != nil {
+		return err
+	}
+
+	if err := ensureColumnExists(db, "users", "gender", "TEXT DEFAULT ''"); err != nil {
 		return err
 	}
 

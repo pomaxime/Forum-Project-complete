@@ -243,7 +243,11 @@ footer {
 .btn-ghost {
   background: #f8fafc;
   color: #111827;
-  border: 1px solid #d1d5db;
+  border: 1px solid #f8fafc;
+}
+
+.btn-ghost-logo {
+  background: #F5F5F4;
 }
 
 .btn-ghost-post {
@@ -258,6 +262,31 @@ footer {
 
 .btn-ghost:hover {
   background: #e2e8f0;
+}
+
+.navbar-logo img {
+    height: 42px;
+    width: auto;
+    display: block;
+}
+
+.navbar-logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.logo-btn {
+    padding: 6px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-btn img {
+    height: 40px;
+    width: auto;
+    display: block;
 }
 
 .form-card form button[type="submit"] {

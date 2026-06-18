@@ -2,7 +2,9 @@
 <header class="navbar">
     <nav>
         <div class="nav-left">
-            <a href="/" class="btn btn-ghost">Accueil</a>
+            <a href="/" class="btn btn-ghost-logo logo-btn">
+                <img src="/static/img/logo.png" alt="Reddick">
+            </a>
 
             {{if .IsLoggedIn}}
                 <a href="/post/create" class="btn btn-primary">Créer un post</a>

@@ -12,24 +12,26 @@ import (
 	"forum/utils"
 )
 
-// PostHandler gère les opérations sur les posts.
 type PostHandler struct {
 	db *sql.DB
 }
 
-// NewPostHandler crée un PostHandler avec la connexion DB fournie.
 func NewPostHandler(db *sql.DB) *PostHandler {
 	return &PostHandler{db: db}
 }
 
-// Post représente un post du forum.
 type Post struct {
-	ID        int
-	Username  string
-	Title     string
-	Content   string
-	Category  string
-	CreatedAt time.Time
+	ID            int
+	UserID        int
+	Username      string
+	Title         string
+	Content       string
+	Category      string
+	CreatedAt     time.Time
+	Likes         int
+	Dislikes      int
+	CommentsCount int
+	CanReact      bool
 }
 
 type CategoryOption struct {
@@ -58,6 +60,8 @@ type PostPageData struct {
 	models.TemplateData
 	Post     Post
 	Comments []Comment
+	Likes    int
+	Dislikes int
 }
 
 var postCategoryOptions = []CategoryOption{
@@ -80,7 +84,6 @@ func init() {
 	}
 }
 
-// Index affiche la liste de tous les posts (page d'accueil).
 func (h *PostHandler) Index(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		http.NotFound(w, r)
@@ -96,12 +99,13 @@ func (h *PostHandler) Index(w http.ResponseWriter, r *http.Request) {
 	))
 
 	category := strings.TrimSpace(r.URL.Query().Get("category"))
-
-	query := `
-		SELECT p.id, u.username, p.title, p.content, p.category, p.created_at
+	query := `SELECT p.id, p.user_id, u.username, p.title, p.content, p.category, p.created_at,
+		(SELECT COUNT(*) FROM likes WHERE post_id = p.id) AS likes,
+		(SELECT COUNT(*) FROM dislikes WHERE post_id = p.id) AS dislikes,
+		(SELECT COUNT(*) FROM comments WHERE post_id = p.id) AS comments_count
 		FROM posts p
-		JOIN users u ON p.user_id = u.id
-	`
+		JOIN users u ON p.user_id = u.id`
+
 	var rows *sql.Rows
 	var err error
 	if category != "" {
@@ -116,22 +120,24 @@ func (h *PostHandler) Index(w http.ResponseWriter, r *http.Request) {
 		query += " ORDER BY p.created_at DESC"
 		rows, err = h.db.Query(query)
 	}
+
 	if err != nil {
 		http.Error(w, "Erreur interne du serveur", http.StatusInternalServerError)
 		return
 	}
 	defer rows.Close()
 
+	userID := middleware.GetUserIDFromCookie(w, h.db, r)
 	var posts []Post
 	for rows.Next() {
 		var p Post
-		if err := rows.Scan(&p.ID, &p.Username, &p.Title, &p.Content, &p.Category, &p.CreatedAt); err != nil {
+		if err := rows.Scan(&p.ID, &p.UserID, &p.Username, &p.Title, &p.Content, &p.Category, &p.CreatedAt, &p.Likes, &p.Dislikes, &p.CommentsCount); err != nil {
 			continue
 		}
+		p.CanReact = userID != 0 && userID != p.UserID
 		posts = append(posts, p)
 	}
 
-	userID := middleware.GetUserIDFromCookie(w, h.db, r)
 	data := IndexData{
 		TemplateData:     models.TemplateData{IsLoggedIn: userID != 0},
 		Posts:            posts,
@@ -140,7 +146,6 @@ func (h *PostHandler) Index(w http.ResponseWriter, r *http.Request) {
 	tmpl.ExecuteTemplate(w, "base", data)
 }
 
-// Create gère la création d'un nouveau post (réservé aux utilisateurs connectés).
 func (h *PostHandler) Create(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles(
 		"templates/base.html",
@@ -198,10 +203,17 @@ func (h *PostHandler) Create(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Récupération de l'utilisateur connecté via le contexte
 		userID := middleware.GetUserID(r)
+		if userID == 0 {
+			http.Error(w, "Vous devez être connecté pour créer un post", http.StatusUnauthorized)
+			return
+		}
 
-		if err := h.createPost(userID, title, content, category); err != nil {
+		_, err := h.db.Exec(
+			"INSERT INTO posts (user_id, title, content, category) VALUES (?, ?, ?, ?)",
+			userID, title, content, category,
+		)
+		if err != nil {
 			http.Error(w, "Erreur interne du serveur", http.StatusInternalServerError)
 			return
 		}
@@ -213,15 +225,6 @@ func (h *PostHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *PostHandler) createPost(userID int, title, content, category string) error {
-	_, err := h.db.Exec(
-		"INSERT INTO posts (user_id, title, content, category) VALUES (?, ?, ?, ?)",
-		userID, title, content, category,
-	)
-	return err
-}
-
-// Show affiche un post individuel.
 func (h *PostHandler) Show(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles(
 		"templates/base.html",
@@ -231,7 +234,6 @@ func (h *PostHandler) Show(w http.ResponseWriter, r *http.Request) {
 		"templates/post.html",
 	))
 
-	// Extraction de l'ID depuis l'URL : /post/42
 	id := strings.TrimPrefix(r.URL.Path, "/post/")
 	if id == "" {
 		http.NotFound(w, r)
@@ -239,13 +241,13 @@ func (h *PostHandler) Show(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var p Post
-	err := h.db.QueryRow(`
-		SELECT p.id, u.username, p.title, p.content, p.category, p.created_at
-		FROM posts p
-		JOIN users u ON p.user_id = u.id
-		WHERE p.id = ?
-	`, id).Scan(&p.ID, &p.Username, &p.Title, &p.Content, &p.Category, &p.CreatedAt)
-
+	err := h.db.QueryRow(
+		`SELECT p.id, p.user_id, u.username, p.title, p.content, p.category, p.created_at
+        FROM posts p
+        JOIN users u ON p.user_id = u.id
+        WHERE p.id = ?`,
+		id,
+	).Scan(&p.ID, &p.UserID, &p.Username, &p.Title, &p.Content, &p.Category, &p.CreatedAt)
 	if err == sql.ErrNoRows {
 		http.NotFound(w, r)
 		return
@@ -255,13 +257,19 @@ func (h *PostHandler) Show(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	commentsRows, err := h.db.Query(`
-		SELECT c.id, u.username, c.content, c.created_at
-		FROM comments c
-		JOIN users u ON c.user_id = u.id
-		WHERE c.post_id = ?
-		ORDER BY c.created_at ASC
-	`, id)
+	currentUserID := middleware.GetUserIDFromCookie(w, h.db, r)
+	p.CanReact = currentUserID != 0 && currentUserID != p.UserID
+
+	commentsRows, err := h.db.Query(
+		`SELECT c.id, c.user_id, u.username, c.content, c.created_at,
+            (SELECT COUNT(*) FROM comment_likes WHERE comment_id = c.id) AS likes,
+            (SELECT COUNT(*) FROM comment_dislikes WHERE comment_id = c.id) AS dislikes
+        FROM comments c
+        JOIN users u ON c.user_id = u.id
+        WHERE c.post_id = ?
+        ORDER BY c.created_at ASC`,
+		id,
+	)
 	if err != nil {
 		http.Error(w, "Erreur interne du serveur", http.StatusInternalServerError)
 		return
@@ -271,22 +279,42 @@ func (h *PostHandler) Show(w http.ResponseWriter, r *http.Request) {
 	var comments []Comment
 	for commentsRows.Next() {
 		var comment Comment
-		if err := commentsRows.Scan(&comment.ID, &comment.Username, &comment.Content, &comment.CreatedAt); err != nil {
+		var commentUserID int
+		if err := commentsRows.Scan(&comment.ID, &commentUserID, &comment.Username, &comment.Content, &comment.CreatedAt, &comment.Likes, &comment.Dislikes); err != nil {
 			continue
 		}
+		comment.CanReact = currentUserID != 0 && currentUserID != commentUserID
 		comments = append(comments, comment)
 	}
 
-	data := PostPageData{
-		TemplateData: models.TemplateData{IsLoggedIn: middleware.GetUserIDFromCookie(w, h.db, r) != 0},
-		Post:         p,
-		Comments:     comments,
+	var likes, dislikes int
+	if err := h.db.QueryRow("SELECT COUNT(*) FROM likes WHERE post_id = ?", id).Scan(&likes); err != nil {
+		http.Error(w, "Erreur interne du serveur", http.StatusInternalServerError)
+		return
+	}
+	if err := h.db.QueryRow("SELECT COUNT(*) FROM dislikes WHERE post_id = ?", id).Scan(&dislikes); err != nil {
+		http.Error(w, "Erreur interne du serveur", http.StatusInternalServerError)
+		return
 	}
 
+	data := PostPageData{
+		TemplateData: models.TemplateData{IsLoggedIn: currentUserID != 0},
+		Post:         p,
+		Comments:     comments,
+		Likes:        likes,
+		Dislikes:     dislikes,
+	}
 	tmpl.ExecuteTemplate(w, "base", data)
 }
 
 func (h *PostHandler) Categories(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("templates/categories.html"))
-	tmpl.Execute(w, nil)
+	tmpl := template.Must(template.ParseFiles(
+		"templates/base.html",
+		"templates/partials/navbar.html",
+		"templates/partials/alerts.html",
+		"templates/partials/footer.html",
+		"templates/categories.html",
+	))
+	data := models.TemplateData{IsLoggedIn: middleware.GetUserIDFromCookie(w, h.db, r) != 0}
+	tmpl.ExecuteTemplate(w, "base", data)
 }

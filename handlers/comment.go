@@ -11,9 +11,13 @@ import (
 
 type Comment struct {
 	ID        int
+	UserID    int
 	Username  string
 	Content   string
 	CreatedAt time.Time
+	Likes     int
+	Dislikes  int
+	CanReact  bool
 }
 
 func (h *PostHandler) Comment(w http.ResponseWriter, r *http.Request) {

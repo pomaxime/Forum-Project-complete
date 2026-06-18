@@ -11,29 +11,25 @@ import (
 )
 
 func main() {
-	// Initialisation de la base de données
 	db, err := database.Init()
 	if err != nil {
 		log.Fatalf("Erreur initialisation base de données : %v", err)
 	}
 	defer db.Close()
 
-	// Création des tables
 	if err := database.CreateTables(db); err != nil {
 		log.Fatalf("Erreur création tables : %v", err)
 	}
 
-	// Handlers avec injection de la DB
 	authHandler := handlers.NewAuthHandler(db)
 	postHandler := handlers.NewPostHandler(db)
+	likeHandler := handlers.NewLikeHandler(db)
 
 	mux := http.NewServeMux()
 
-	// Fichiers statiques
 	fs := http.FileServer(http.Dir("./static"))
 	mux.Handle("/static/", http.StripPrefix("/static/", fs))
 
-	// Routes publiques
 	mux.HandleFunc("/", postHandler.Index)
 	mux.HandleFunc("/register", authHandler.Register)
 	mux.HandleFunc("/login", authHandler.Login)
@@ -42,6 +38,10 @@ func main() {
 
 	// Routes protégées (middleware auth)
 	mux.Handle("/comment", middleware.Auth(db, http.HandlerFunc(postHandler.Comment)))
+	mux.Handle("/comment/like", middleware.Auth(db, http.HandlerFunc(likeHandler.LikeComment)))
+	mux.Handle("/comment/dislike", middleware.Auth(db, http.HandlerFunc(likeHandler.DislikeComment)))
+	mux.Handle("/like", middleware.Auth(db, http.HandlerFunc(likeHandler.Like)))
+	mux.Handle("/dislike", middleware.Auth(db, http.HandlerFunc(likeHandler.Dislike)))
 	mux.Handle("/logout", middleware.Auth(db, http.HandlerFunc(authHandler.Logout)))
 	mux.Handle("/profile", middleware.Auth(db, http.HandlerFunc(authHandler.Profile)))
 	mux.Handle("/post/create", middleware.Auth(db, http.HandlerFunc(postHandler.Create)))

@@ -15,7 +15,6 @@ import (
 	"github.com/google/uuid"
 )
 
-// Login gère la connexion d'un utilisateur existant.
 func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles(
 		"templates/base.html",
@@ -48,7 +47,6 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		email := strings.TrimSpace(r.FormValue("email"))
 		password := r.FormValue("password")
 
-		// Validation basique
 		if err := utils.ValidateLogin(email, password); err != nil {
 			data := models.TemplateData{Error: err.Error()}
 			var buf bytes.Buffer
@@ -60,10 +58,8 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Recherche de l'utilisateur
 		id, _, hashedPassword, err := getUserByEmail(h.db, email)
 		if err == sql.ErrNoRows {
-			// Message volontairement vague (sécurité : ne pas révéler si l'email existe)
 			data := models.TemplateData{Error: "Email ou mot de passe incorrect"}
 			var buf bytes.Buffer
 			if err := tmpl.ExecuteTemplate(&buf, "base", data); err != nil {
@@ -78,7 +74,6 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Vérification bcrypt
 		if err := utils.CheckPassword(hashedPassword, password); err != nil {
 			data := models.TemplateData{Error: "Email ou mot de passe incorrect"}
 			var buf bytes.Buffer
@@ -99,7 +94,6 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		sessionID := uuid.New().String()
 		expiresAt := time.Now().Add(24 * time.Hour)
 
-		// Stockage de la session en base de données
 		_, err = h.db.Exec(
 			"INSERT INTO sessions (id, user_id, expires_at) VALUES (?, ?, ?)",
 			sessionID, id, expiresAt,
@@ -109,11 +103,10 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Création du cookie sécurisé
 		http.SetCookie(w, &http.Cookie{
 			Name:     "session_id",
 			Value:    sessionID,
-			HttpOnly: true, // Inaccessible depuis JavaScript
+			HttpOnly: true,
 			Secure:   r.TLS != nil,
 			Path:     "/",
 			Expires:  expiresAt,

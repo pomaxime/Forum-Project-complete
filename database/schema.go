@@ -5,46 +5,79 @@ import (
 	"fmt"
 )
 
-// CreateTables crée toutes les tables nécessaires si elles n'existent pas.
 func CreateTables(db *sql.DB) error {
 	queries := []string{
-		// Table des utilisateurs
 		`CREATE TABLE IF NOT EXISTS users (
-			id       INTEGER PRIMARY KEY AUTOINCREMENT,
-			username TEXT    NOT NULL UNIQUE,
-			email    TEXT    NOT NULL UNIQUE,
-			password TEXT    NOT NULL
-		)`,
+            id         INTEGER PRIMARY KEY AUTOINCREMENT,
+            username   TEXT    NOT NULL UNIQUE,
+            email      TEXT    NOT NULL UNIQUE,
+            password   TEXT    NOT NULL,
+            avatar_url TEXT    DEFAULT '',
+            gender     TEXT    DEFAULT ''
+        )`,
 
-		// Table des sessions
 		`CREATE TABLE IF NOT EXISTS sessions (
-			id         TEXT    PRIMARY KEY,
-			user_id    INTEGER NOT NULL,
-			expires_at DATETIME NOT NULL,
-			FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
-		)`,
+            id         TEXT    PRIMARY KEY,
+            user_id    INTEGER NOT NULL,
+            expires_at DATETIME NOT NULL,
+            FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+        )`,
 
-		// Table des posts
 		`CREATE TABLE IF NOT EXISTS posts (
-			id         INTEGER PRIMARY KEY AUTOINCREMENT,
-			user_id    INTEGER NOT NULL,
-			title      TEXT    NOT NULL,
-			content    TEXT    NOT NULL,
-			category   TEXT    NOT NULL DEFAULT 'general',
-			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-			FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
-		)`,
+            id         INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id    INTEGER NOT NULL,
+            title      TEXT    NOT NULL,
+            content    TEXT    NOT NULL,
+            category   TEXT    NOT NULL DEFAULT 'general',
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+        )`,
 
-		// Table des commentaires
 		`CREATE TABLE IF NOT EXISTS comments (
-			id         INTEGER PRIMARY KEY AUTOINCREMENT,
-			post_id    INTEGER NOT NULL,
-			user_id    INTEGER NOT NULL,
-			content    TEXT    NOT NULL,
-			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-			FOREIGN KEY(post_id) REFERENCES posts(id) ON DELETE CASCADE,
-			FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
-		)`,
+            id         INTEGER PRIMARY KEY AUTOINCREMENT,
+            post_id    INTEGER NOT NULL,
+            user_id    INTEGER NOT NULL,
+            content    TEXT    NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(post_id) REFERENCES posts(id) ON DELETE CASCADE,
+            FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+        )`,
+
+		`CREATE TABLE IF NOT EXISTS likes (
+            id      INTEGER PRIMARY KEY AUTOINCREMENT,
+            post_id INTEGER NOT NULL,
+            user_id INTEGER NOT NULL,
+            FOREIGN KEY(post_id) REFERENCES posts(id) ON DELETE CASCADE,
+            FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+            UNIQUE(post_id, user_id)
+        )`,
+
+		`CREATE TABLE IF NOT EXISTS dislikes (
+            id      INTEGER PRIMARY KEY AUTOINCREMENT,
+            post_id INTEGER NOT NULL,
+            user_id INTEGER NOT NULL,
+            FOREIGN KEY(post_id) REFERENCES posts(id) ON DELETE CASCADE,
+            FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+            UNIQUE(post_id, user_id)
+        )`,
+
+		`CREATE TABLE IF NOT EXISTS comment_likes (
+            id         INTEGER PRIMARY KEY AUTOINCREMENT,
+            comment_id INTEGER NOT NULL,
+            user_id    INTEGER NOT NULL,
+            FOREIGN KEY(comment_id) REFERENCES comments(id) ON DELETE CASCADE,
+            FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+            UNIQUE(comment_id, user_id)
+        )`,
+
+		`CREATE TABLE IF NOT EXISTS comment_dislikes (
+            id         INTEGER PRIMARY KEY AUTOINCREMENT,
+            comment_id INTEGER NOT NULL,
+            user_id    INTEGER NOT NULL,
+            FOREIGN KEY(comment_id) REFERENCES comments(id) ON DELETE CASCADE,
+            FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+            UNIQUE(comment_id, user_id)
+        )`,
 	}
 
 	for _, query := range queries {
@@ -54,6 +87,14 @@ func CreateTables(db *sql.DB) error {
 	}
 
 	if err := ensureColumnExists(db, "posts", "category", "TEXT NOT NULL DEFAULT 'general'"); err != nil {
+		return err
+	}
+
+	if err := ensureColumnExists(db, "users", "avatar_url", "TEXT DEFAULT ''"); err != nil {
+		return err
+	}
+
+	if err := ensureColumnExists(db, "users", "gender", "TEXT DEFAULT ''"); err != nil {
 		return err
 	}
 

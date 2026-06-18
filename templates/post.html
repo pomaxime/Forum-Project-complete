@@ -15,10 +15,35 @@
                 <span>@{{.Username}}</span>
                 <span class="dot">•</span>
                 <span>{{.CreatedAt.Format "02/01/2006 à 15:04"}}</span>
+            </div>
+            <div style="margin-top:0.5rem; margin-bottom:1rem;">
                 <span class="tag post-category">{{.Category}}</span>
             </div>
             <h1 class="post-title post-title-large">{{.Title}}</h1>
             <p class="post-content">{{.Content}}</p>
+            <div class="post-actions post-actions-inline" style="margin-top:1rem; gap:0.5rem; display:flex; flex-wrap:wrap; align-items:center;">
+                {{if .CanReact}}
+                <form method="POST" action="/like" style="display:inline;">
+                    <input type="hidden" name="post_id" value="{{.ID}}">
+                    <button type="submit" class="btn btn-outline">👍 {{$.Likes}}</button>
+                </form>
+                <form method="POST" action="/dislike" style="display:inline;">
+                    <input type="hidden" name="post_id" value="{{.ID}}">
+                    <button type="submit" class="btn btn-outline">👎 {{$.Dislikes}}</button>
+                </form>
+                {{else}}
+                <div class="post-reactions" style="display:flex; gap:1rem;">
+                    <span>👍 {{$.Likes}}</span>
+                    <span>👎 {{$.Dislikes}}</span>
+                </div>
+                {{end}}
+            </div>
+            <div style="margin-top:1rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+                {{if $.IsLoggedIn}}
+                <button type="button" class="btn btn-ghost" style="border:1px solid #d1d5db;">💬 Commenter</button>
+                <button type="button" class="btn btn-ghost" data-share-url="/post/{{.ID}}" onclick="copyShareLink(this)" style="border:1px solid #d1d5db;">🔗 Partager</button>
+                {{end}}
+            </div>
         </article>
         {{end}}
 
@@ -34,6 +59,21 @@
                 <div class="comment-card">
                     <div class="comment-meta">@{{.Username}} · {{.CreatedAt.Format "02/01/2006 à 15:04"}}</div>
                     <p>{{.Content}}</p>
+                    <div class="comment-actions" style="margin-top:0.75rem; display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+                        {{if .CanReact}}
+                        <form method="POST" action="/comment/like" style="display:inline">
+                            <input type="hidden" name="comment_id" value="{{.ID}}">
+                            <button type="submit" class="btn btn-outline">👍 {{.Likes}}</button>
+                        </form>
+                        <form method="POST" action="/comment/dislike" style="display:inline">
+                            <input type="hidden" name="comment_id" value="{{.ID}}">
+                            <button type="submit" class="btn btn-outline">👎 {{.Dislikes}}</button>
+                        </form>
+                        {{else}}
+                        <span>👍 {{.Likes}}</span>
+                        <span>👎 {{.Dislikes}}</span>
+                        {{end}}
+                    </div>
                 </div>
                 {{end}}
             </div>

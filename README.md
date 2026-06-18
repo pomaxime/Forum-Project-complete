@@ -71,8 +71,8 @@ Chaque utilisateur dispose d'un espace personnel permettant de consulter :
 |------------|-------------|
 | Go (Golang) | Développement du backend |
 | SQLite | Base de données |
-| HTML5 | Structure des pages |
-| CSS3 | Mise en forme |
+| HTML | Structure des pages |
+| CSS | Mise en forme |
 | JavaScript | Interactivité |
 | bcrypt | Chiffrement des mots de passe |
 | UUID | Gestion des sessions |

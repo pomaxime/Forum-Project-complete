@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"time"
 	"net/http"
 
 	"forum/database"
@@ -47,5 +48,13 @@ func main() {
 	mux.Handle("/post/create", middleware.Auth(db, http.HandlerFunc(postHandler.Create)))
 
 	fmt.Println("Serveur démarré sur http://localhost:8080")
-	log.Fatal(http.ListenAndServe(":8080", mux))
+    srv := &http.Server{
+        Addr:         ":8080",
+        Handler:      mux,
+        ReadTimeout:  5 * time.Second,
+        WriteTimeout: 10 * time.Second,
+    }
+    if err := srv.ListenAndServe(); err != nil {
+        log.Fatalf("Erreur serveur : %v", err)
+    }
 }

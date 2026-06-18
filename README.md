@@ -1,97 +1,72 @@
-# Forum Reddit Clone — Module Authentification & Sécurité
+# ForumHub — Clone Reddit en Go
 
-## Structure du projet
+## 📖 Présentation
 
-```
+ForumHub est une plateforme de discussion inspirée de Reddit, développée en **Go (Golang)** avec une architecture modulaire. Les utilisateurs peuvent créer un compte, publier des sujets, commenter, réagir aux publications et filtrer le contenu par catégories.
+
+Le projet met l'accent sur :
+
+- 🔐 La sécurité des utilisateurs
+- 🗄️ La persistance des données avec SQLite
+- 🧩 Une architecture claire et maintenable
+- 🎨 Une interface moderne inspirée des plateformes communautaires actuelles
+
+---
+
+## 🚀 Fonctionnalités
+
+### Authentification
+
+- Inscription utilisateur
+- Connexion sécurisée
+- Déconnexion
+- Sessions persistantes
+- Cookies HttpOnly
+
+### Publications
+
+- Création de posts
+- Consultation des posts
+- Affichage détaillé d'un sujet
+- Filtrage par catégories
+
+### Commentaires
+
+- Ajout de commentaires
+- Affichage des commentaires liés à un post
+
+### Système de votes
+
+- Like sur les publications
+- Dislike sur les publications
+- Like sur les commentaires
+- Dislike sur les commentaires
+
+### Profil utilisateur
+
+- Consultation des publications personnelles
+- Historique d'activité
+
+---
+
+## 🏗️ Architecture du projet
+
+```text
 /forum
-├── main.go                  ← Point d'entrée, routeur HTTP
-├── go.mod / go.sum
-├── main_test.go             ← Tests (register, login, logout, middleware, sessions)
 │
-├── database/
-│   ├── db.go                ← Connexion SQLite
-│   └── schema.go            ← Création des tables (users, sessions, posts)
+├── config/                 # Configuration générale
+├── database/               # Initialisation SQLite et schéma
+├── handlers/               # Contrôleurs HTTP
+├── middleware/             # Authentification et sécurité
+├── models/                 # Structures métier
+├── repository/             # Accès aux données
+├── routes/                 # Déclaration des routes
+├── services/               # Logique métier
+├── sessions/               # Gestion des sessions
+├── static/                 # CSS, images, ressources
+├── templates/              # Templates HTML
+├── utils/                  # Outils et validations
 │
-├── handlers/
-│   ├── auth_handler.go      ← Struct AuthHandler partagée
-│   ├── register.go          ← Inscription
-│   ├── login.go             ← Connexion + création session/cookie
-│   ├── logout.go            ← Déconnexion + suppression session/cookie
-│   └── post_handler.go      ← Index, création et affichage de posts
-│
-├── middleware/
-│   └── auth.go              ← Vérification session + expiration + injection userID
-│
-├── utils/
-│   ├── password.go          ← Hash bcrypt + vérification
-│   └── validation.go        ← Validation formulaires (register, login, posts)
-│
-├── templates/               ← HTML (Go template)
-│   ├── register.html
-│   ├── login.html
-│   ├── index.html
-│   ├── create_post.html
-│   └── post.html
-│
-└── static/
-    └── style.css
-```
-
-## Installation
-
-```bash
-# 1. Cloner / copier le projet
-cd forum
-
-# 2. Installer les dépendances
-go mod tidy
-
-# 3. Lancer le serveur
-go run main.go
-# → http://localhost:8080
-```
-
-## Lancer les tests
-
-```bash
-go test -v ./...
-```
-
-## Ce que couvre ce projet
-
-| Fonctionnalité       | Fichier                        |
-|----------------------|--------------------------------|
-| SQLite               | database/db.go + schema.go     |
-| Tables users/sessions| database/schema.go             |
-| Hash bcrypt          | utils/password.go              |
-| Validation           | utils/validation.go            |
-| Register             | handlers/register.go           |
-| Login + Session      | handlers/login.go              |
-| Logout               | handlers/logout.go             |
-| Cookie HttpOnly      | handlers/login.go              |
-| Middleware auth      | middleware/auth.go             |
-| Routes protégées     | main.go                        |
-| Protection SQL inj.  | Requêtes préparées (? partout) |
-| Sessions expirées    | middleware/auth.go             |
-
-## Points importants pour l'oral
-
-**Pourquoi bcrypt ?**
-bcrypt est une fonction de hachage lente par conception (coût configurable). Même si la base
-de données est volée, le brute-force de tous les mots de passe prendrait des années.
-
-**Différence cookie / session ?**
-La session est stockée côté serveur (SQLite). Le cookie contient uniquement l'ID de session
-(UUID opaque). Si le cookie est volé, on peut révoquer la session côté serveur.
-
-**Pourquoi middleware ?**
-Le middleware centralise la vérification auth en un seul endroit. On ne peut pas oublier de
-protéger une route, et si la logique change (ex: ajouter 2FA), on le fait une seule fois.
-
-**Comment éviter SQL Injection ?**
-Toutes les requêtes utilisent des paramètres préparés (?) — jamais de concaténation de
-strings avec des données utilisateur.
-
-**Pourquoi HttpOnly sur le cookie ?**
-Empêche JavaScript d'accéder au cookie, ce qui bloque les attaques XSS qui tenteraient
-de voler la session.
+├── main.go                 # Point d'entrée
+├── go.mod
+└── go.sum

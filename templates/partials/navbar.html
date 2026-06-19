@@ -1,0 +1,27 @@
+{{define "navbar"}}
+<header class="navbar">
+    <nav>
+        <div class="nav-left">
+            <a href="/" class="btn btn-ghost-logo logo-btn">
+                <img src="/static/img/logo.png" alt="Reddick">
+            </a>
+
+            {{if .IsLoggedIn}}
+                <a href="/post/create" class="btn btn-primary">Créer un post</a>
+                <a href="/profile" class="btn btn-ghost">Profil</a>
+            {{else}}
+                <a href="/login" class="btn btn-ghost">Login</a>
+                <a href="/register" class="btn btn-primary">Register</a>
+            {{end}}
+        </div>
+
+        {{if .IsLoggedIn}}
+        <div class="nav-right">
+            <form action="/logout" method="POST">
+                <button type="submit" class="btn btn-outline">Déconnexion</button>
+            </form>
+        </div>
+        {{end}}
+    </nav>
+</header>
+{{end}}

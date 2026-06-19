@@ -1,0 +1,107 @@
+# =========================
+# Project-specific ignores
+# =========================
+# Keep only patterns that apply to this repository
+
+# Go coverage and test artifacts
+coverage.out
+*.coverprofile
+
+# Dependency directory (if you vendor deps locally)
+vendor/
+
+# Logs
+*.log
+
+# =========================
+# DATABASE
+# =========================
+# Ignore any sqlite files
+*.db
+*.sqlite
+*.sqlite3
+
+# Project DB (explicit)
+/database.db
+database/forum.db
+
+# =========================
+# ENVIRONMENT VARIABLES
+# =========================
+.env
+.env.local
+.env.dev
+.env.prod
+
+# =========================
+# IDE / EDITORS
+# =========================
+
+# VSCode
+.vscode/
+
+# JetBrains
+.idea/
+
+# Sublime
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+
+# =========================
+# OS FILES
+# =========================
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# Linux
+*~
+
+# =========================
+# NODE (si frontend plus tard)
+# =========================
+node_modules/
+
+# =========================
+# DOCKER
+# =========================
+docker-compose.override.yml
+
+# =========================
+# TEMP FILES
+# =========================
+tmp/
+temp/
+.cache/
+
+# =========================
+# UPLOADS
+# =========================
+static/uploads/
+
+# =========================
+# TESTS
+# =========================
+*.prof
+*.pprof
+
+# =========================
+# SECURITY
+# =========================
+secrets/
+private/
+
+# =========================
+# MISC
+# =========================
+*.bak
+*.old
+*.tmp

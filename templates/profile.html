@@ -1,0 +1,56 @@
+{{define "content"}}
+<h1>Profil utilisateur</h1>
+<div class="profile-grid">
+    <div class="profile-card">
+        <div class="profile-avatar">
+            {{if .User.AvatarURL}}
+            <img src="{{.User.AvatarURL}}" alt="Avatar" />
+            {{else}}
+            <div class="avatar-placeholder">A</div>
+            {{end}}
+        </div>
+        <div>
+            <h2>{{.User.Username}}</h2>
+            <p>{{.User.Email}}</p>
+            <p><strong>Genre :</strong> {{if .User.Gender}}{{.User.Gender}}{{else}}Non renseigné{{end}}</p>
+        </div>
+    </div>
+
+    <div class="form-card">
+        {{if .Error}}
+        <div class="alert alert-error">{{.Error}}</div>
+        {{end}}
+        {{if .Success}}
+        <div class="alert alert-success">{{.Success}}</div>
+        {{end}}
+
+        <form action="/profile" method="POST">
+            <label for="username">Nom d'utilisateur</label>
+            <input id="username" name="username" type="text" value="{{.User.Username}}" required />
+
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" value="{{.User.Email}}" required />
+
+            <label for="avatar_url">URL de l'avatar</label>
+            <input id="avatar_url" name="avatar_url" type="url" value="{{.User.AvatarURL}}" placeholder="https://..." />
+
+            <label for="gender">Genre</label>
+            <select id="gender" name="gender">
+                <option value="" {{if eq .User.Gender ""}}selected{{end}}>Non renseigné</option>
+                <option value="Homme" {{if eq .User.Gender "Homme"}}selected{{end}}>Homme</option>
+                <option value="Femme" {{if eq .User.Gender "Femme"}}selected{{end}}>Femme</option>
+                <option value="Autre" {{if eq .User.Gender "Autre"}}selected{{end}}>Autre</option>
+            </select>
+
+            <h3>Changer le mot de passe</h3>
+            <label for="new_password">Nouveau mot de passe</label>
+            <input id="new_password" name="new_password" type="password" />
+
+            <label for="confirm_password">Confirmer le nouveau mot de passe</label>
+            <input id="confirm_password" name="confirm_password" type="password" />
+
+            <button type="submit" class="btn btn-primary">Mettre à jour le profil</button>
+        </form>
+    </div>
+</div>
+{{end}}

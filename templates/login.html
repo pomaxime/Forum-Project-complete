@@ -1,0 +1,22 @@
+{{define "content"}}
+<div class="auth-page">
+    <div class="form-card">
+        <h1>Connexion</h1>
+        <form method="POST" action="/login">
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label>Mot de passe</label>
+                <input type="password" name="password" required>
+            </div>
+            {{if .Next}}
+            <input type="hidden" name="next" value="{{.Next}}">
+            {{end}}
+            <button type="submit">Se connecter</button>
+        </form>
+        <p class="form-footer">Pas de compte ? <a href="/register">S'inscrire</a></p>
+    </div>
+</div>
+{{end}}

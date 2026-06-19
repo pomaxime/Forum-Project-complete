@@ -1,0 +1,27 @@
+{{define "content"}}
+<h1>Nouveau post</h1>
+<div class="form-card form-card--centered">
+    <form method="POST" action="/post/create">
+        <div class="form-group">
+            <label for="title">Titre</label>
+            <input id="title" type="text" name="title" class="{{.TitleClass}}" required autocomplete="off" autofocus value="{{.Title}}">
+        </div>
+        <div class="form-group">
+            <label for="category">Catégorie</label>
+            <select id="category" name="category" class="{{.CategoryClass}}" required>
+                {{range .Categories}}
+                <option value="{{.Value}}" {{if eq $.Category .Value}}selected{{end}}>{{.Label}}</option>
+                {{end}}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="content">Contenu</label>
+            <textarea id="content" name="content" class="{{.ContentClass}}" required placeholder="Tape ton contenu ici...">{{.Content}}</textarea>
+        </div>
+        <div style="display:flex;gap:0.5rem">
+            <button type="submit" class="btn btn-primary">Publier</button>
+            <a href="/" class="btn btn-ghost">Annuler</a>
+        </div>
+    </form>
+</div>
+{{end}}
